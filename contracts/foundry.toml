@@ -1,0 +1,14 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+fs_permissions = [
+    { access = "read", path = "testdata/blockhashmerkleleaves"},
+    { access = "read", path = "testdata/blockheaderinfo"},
+    { access = "read", path = "testdata/vdf"}
+]
+
+[fuzz]
+runs = 50
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
