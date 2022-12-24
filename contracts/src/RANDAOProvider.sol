@@ -4,17 +4,15 @@ pragma solidity ^0.8.13;
 import {Owned} from "solmate/auth/Owned.sol";
 import {LibString} from "solmate/utils/LibString.sol";
 
-import {RLPReader} from "./RLPReader.sol";
 import {IBlockhashOracle} from "./IBlockhashOracle.sol";
 import {IRandomnessProvider} from "./IRandomnessProvider.sol";
+import {RLPReader} from "./utils/RLPReader.sol";
 
-import {TurboVerifier} from "./VDFVerifier.sol";
-
-/// @title Randao Randomness Beacon
+/// @title RANDAO Randomness Beacon
 /// @author AmanGotchu <aman@paradigm.xyz>
 /// @author sinasab <sina@paradigm.xyz>
 /// @notice An experimental onchain randomness project by Paradigm.
-contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
+contract RANDAOProvider is Owned, IRandomnessProvider {
     using RLPReader for RLPReader.RLPItem;
     using RLPReader for RLPReader.Iterator;
     using RLPReader for bytes;
@@ -47,7 +45,7 @@ contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice The randomness value, indexed by block number.
-    mapping(uint256 => uint256) public blockNumToRanDAO;
+    mapping(uint256 => uint256) public blockNumToRANDAO;
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
@@ -86,31 +84,31 @@ contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
 
     /// @notice Attests to the previous block's RandDAO value using difficulty
     /// the difficulty opcode.
-    /// TODO(aman): Verify we're adding the randao value to the right block!
+    /// TODO(aman): Verify we're adding the RANDAO value to the right block!
     function poke() external returns (uint256) {
-        uint256 ranDAO = block.difficulty;
+        uint256 RANDAO = block.difficulty;
 
-        blockNumToRanDAO[block.number - 1] = ranDAO;
+        blockNumToRANDAO[block.number - 1] = RANDAO;
 
-        emit RandomnessAvailable(block.number - 1, ranDAO);
+        emit RandomnessAvailable(block.number - 1, RANDAO);
 
-        return ranDAO;
+        return RANDAO;
     }
 
     /// @notice Takes an RLP encoded block header, verifies its validity, and
-    /// cements the randao value for that block in storage.
+    /// cements the RANDAO value for that block in storage.
     /// @param rlp RLP encoded block header.
-    function submitRanDAO(bytes memory rlp) external returns (uint256) {
+    function submitRANDAO(bytes memory rlp) external returns (uint256) {
         // Decode RLP encoded block header.
         RLPReader.RLPItem[] memory ls = rlp.toRlpItem().toList();
 
         // Extract out block number from decoded RLP header.
         uint256 blockNum = ls[8].toUint();
 
-        // Return randao early if already submitted.
-        uint256 ranDAO = blockNumToRanDAO[blockNum];
-        if (ranDAO != 0) {
-            return ranDAO;
+        // Return RANDAO early if already submitted.
+        uint256 RANDAO = blockNumToRANDAO[blockNum];
+        if (RANDAO != 0) {
+            return RANDAO;
         }
 
         // Validate blockhash using block hash oracle.
@@ -119,19 +117,19 @@ contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
             revert BlockhashUnverified(blockHash);
         }
 
-        // Extract out mixhash (randao) from block header.
-        ranDAO = ls[13].toUint();
+        // Extract out mixhash (RANDAO) from block header.
+        RANDAO = ls[13].toUint();
 
-        // Cements randao value to this block number.
-        blockNumToRanDAO[blockNum] = ranDAO;
+        // Cements RANDAO value to this block number.
+        blockNumToRANDAO[blockNum] = RANDAO;
 
-        emit RandomnessAvailable(blockNum, ranDAO);
+        emit RandomnessAvailable(blockNum, RANDAO);
 
-        return ranDAO;
+        return RANDAO;
     }
 
     /// @notice Function to be called when a user requests randomness.
-    /// A user requests randomness which commits them to a future block's randao value.
+    /// A user requests randomness which commits them to a future block's RANDAO value.
     /// That future block's number is returned to the user which
     /// can be used to read the randomness value when it's posted by a prover.
     function requestRandomness() external returns (uint256) {
@@ -166,14 +164,14 @@ contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
     }
 
     /// @notice Fetch the random value tied to a specific block with option
-    /// to generate more random values using the initial randao value as a seed.
-    /// The random value being fetch is the RanDAO, which
+    /// to generate more random values using the initial RANDAO value as a seed.
+    /// The random value being fetch is the RANDAO, which
     /// is a form of randomness generated and used in the consensus layer.
-    /// A new ranDAO value is generated per block and is exposed in the block header, which
-    /// we use to attest to randao values at any block.
-    /// This contract stores all randao values that are verified from provers calling `submitRanDAO`.
-    /// Randao in consensus is a "good enough" form of randomness and extremely difficult to bias
-    /// while theoretically possible. Read all about RanDAO + security risks
+    /// A new RANDAO value is generated per block and is exposed in the block header, which
+    /// we use to attest to RANDAO values at any block.
+    /// This contract stores all RANDAO values that are verified from provers calling `submitRANDAO`.
+    /// RANDAO in consensus is a "good enough" form of randomness and extremely difficult to bias
+    /// while theoretically possible. Read all about RANDAO + security risks
     /// here: https://eth2book.info/bellatrix/part2/building_blocks/randomness/
     /// @param blockNum Block number to fetch randomness from.
     /// @param numberRandomValues Number of random values returned.
@@ -186,20 +184,20 @@ contract RandomnessProvider is Owned, IRandomnessProvider, TurboVerifier {
             revert RequestedZeroRandomValues();
         }
 
-        uint256 ranDAO = blockNumToRanDAO[blockNum];
+        uint256 RANDAO = blockNumToRANDAO[blockNum];
 
-        // Ensure randao value is proven AND user isn't trying to fetch
+        // Ensure RANDAO value is proven AND user isn't trying to fetch
         // randomness from a current or future block.
-        if (ranDAO == 0) {
+        if (RANDAO == 0) {
             revert RandomnessNotAvailable(blockNum);
         }
 
-        // Uses Randao as the seed to generate more random values.
-        return generateMoreRandomValues(ranDAO, numberRandomValues);
+        // Uses RANDAO as the seed to generate more random values.
+        return generateMoreRandomValues(RANDAO, numberRandomValues);
     }
 
     /// @notice Generates more random values using keccak given an initial seed.
-    /// View disclaimer about how the random seed (randao) is generated in function above!
+    /// View disclaimer about how the random seed (RANDAO) is generated in function above!
     /// @param seed Initial value to base the rest of the random values on.
     /// @param numRandomValues Number of values to return.
     function generateMoreRandomValues(uint256 seed, uint256 numRandomValues)

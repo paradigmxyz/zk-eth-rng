@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # High level steps:
-# 1. compiles the circuit
-# 2. generates a witness
-# 3. generates a trusted setup
-# 4. generates a proof
-# 5. verifies the proof
+# 1. Generates RLP encoded blockheader input for the circuit.
+# 2. Compiles the circuit.
+# 3. Generates a witness.
+# 4. Generates a trusted setup.
+# 5. Generates a proof.
+# 6. Generates calldata for verifier contract.
 
+# Instructions:
 # Run from circuits directory
 # Example usage: BLOCK_NUM=8150150 ./single_block_header_zkp/build_single_block.sh
 

@@ -4,13 +4,7 @@ pragma solidity ^0.8.13;
 import "./IBlockhashOracle.sol";
 import "./SingleBlockHeaderVerifier.sol";
 
-error InvalidProof();
-error InvalidBlockHash(bytes32 blockHash);
-error LinksUnavailable(bytes32 blockHash, uint256 blockNum);
-
-contract ZKPBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
-    mapping(uint256 => bytes32) public numToHash;
-
+contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     /// @notice Maps validated blockhashes to their block number.
     mapping(bytes32 => uint256) public blockhashToBlockNum;
 
@@ -19,14 +13,24 @@ contract ZKPBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     //////////////////////////////////////////////////////////////*/
 
     error PokeRangeError();
+    error InvalidProof();
+    error BlockhashUnvalidated(bytes32 blockHash);
+    error LinksUnavailable(bytes32 blockHash, uint256 blockNum);
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    // 
+    /// @notice Validates the block hash of the block before the contract was initialized.
     constructor() {
         poke();
+    }
+
+    /// @notice Returns the block number of a validated block hash.
+    /// This doubles as a block hash verifier and a block number oracle.
+    /// @param hash Blockhash being verified.
+    function blockHashToNumber(bytes32 hash) external view returns (uint256) {
+        return blockhashToBlockNum[hash];
     }
 
     /// @notice Validates the block hash of the block before this tx is called.
@@ -50,12 +54,6 @@ contract ZKPBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
         setValidBlockhash(blockhashVal, blockNum);
     }
 
-    /// @notice Returns the nonzero, accurate block number 
-    /// if the block hash is validated!.
-    function blockHashToNumber(bytes32 hash) external view returns (uint256) {
-        return blockhashToBlockNum[hash];
-    }
-
     /// @notice Validates blockhash and blocknum in storage and emits a validated event.
     /// @param blockNum Block number of the blockhash being validated.
     /// @param blockHash Blockhash being validated.
@@ -65,31 +63,44 @@ contract ZKPBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
         emit BlockhashValidated(blockHash);
     }
 
-    function prove(
+    function verifyParentHash(
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
         uint256[198] memory publicInputs
-    ) public {
-        if (!verifyProof(a, b, c, publicInputs)) {
-            revert InvalidProof();
-        }
+    ) public returns (bool) {
+        // Extract the hash first and verify it's been validated
+        
+        /*
+            We can only attest to a proof under specific conditions.
+            1. We need to submit a proof for a blockhash that is already attested to.
+                - This helps us attest to parent blockhashes.
+                - We don't need an RLP decoding scheme
+                - We need to poke so we have a blockhash to work off of
+                - Then submit a proof for that blockhash so we can attest to the parenthash of that block
+                - Then the cycle continues
 
-        // Parse relevant information from the proof's public inputs.
+                - Just need poke + proof
+            2. 
+        */
+
+        /// Parse relevant information from the proof's public inputs.
+        // First 32 bytes are the anchored block hash.
         uint256 i = 0;
-        // First 32 bytes is the anchored block hash.
         bytes32 blockHash;
         for (; i < 64; i++) {
             blockHash <<= 4;
             blockHash |= bytes32(publicInputs[i]);
         }
-        // Next 32 bytes is the parentHash.
+
+        // Next 32 bytes are the parentHash.
         bytes32 parentHash;
         for (; i < 128; i++) {
             parentHash <<= 4;
             parentHash |= bytes32(publicInputs[i]);
         }
-        // Next 6 bytes is the anchored block's number.
+
+        // Next 3 bytes are the anchored block's number.
         bytes32 blockNumAccumulator;
         for (; i < 134; i++) {
             blockNumAccumulator <<= 4;
@@ -97,15 +108,28 @@ contract ZKPBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
         }
         uint256 blockNum = uint256(blockNumAccumulator);
 
-        if (numToHash[blockNum] != blockHash) {
-            // If within range poke with blockhash opcode.
+        // If the anchored block hash hasn't been validated, we can try to validate using blockhash opcode.
+        if (blockhashToBlockNum[blockHash] == 0) {
+            // If within range anchor blockhash using opcode.
             if (block.number <= blockNum + 256) {
-                pokeBlocknum(blockNum);
+                // Verify the blockhash opcode matches the blockhash from the proof.
+                bytes32 blockHashFromOpcode = blockhash(blockNum);
+                if (blockHashFromOpcode != blockHash) {
+                    revert InvalidProof();
+                }
+
+                setValidBlockhash(blockHash, blockNum);
             } else {
-                revert InvalidBlockHash(blockHash);
+                revert BlockhashUnvalidated(blockHash);
             }
         }
 
+        // After fulfilling pre-reqs, we can verify the proof.
+        if (!verifyProof(a, b, c, publicInputs)) {
+            revert InvalidProof();
+        }
+
         setValidBlockhash(parentHash, blockNum-1);
+        return true;
     }
 }
