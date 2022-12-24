@@ -37,7 +37,7 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
   const {
     parentHash,
     sha3Uncles,
-    miner, // Coinbase
+    miner,
     stateRoot,
     transactionsRoot,
     receiptsRoot,
@@ -50,11 +50,11 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
     extraData,
     mixHash,
     nonce,
-    baseFeePerGas, // For Post 1559 blocks
-    hash, // For comparison afterwards
+    baseFeePerGas, // For Post 1559 blocks.
+    hash, // For sanity comparison check.
   } = blockHeaderData;
 
-  // Construct bytes like input to RLP encode function
+  // Construct bytes like input to RLP encode function.
   const blockHeaderInputs: { [key: string]: string } = {
     parentHash,
     sha3Uncles,
@@ -71,20 +71,21 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
     extraData,
     mixHash,
     nonce,
-    baseFeePerGas // Post 1559 Blocks
+    baseFeePerGas
   };
 
+  // Format inputs according to RLP encoding spec.
   Object.keys(blockHeaderInputs).map((key: string) => {
     let val = blockHeaderInputs[key];
 
-    // All 0 values for these fields must be 0x
+    // All 0 values for these fields must be 0x.
     if (["gasLimit", "gasUsed", "timestamp", "difficulty", "number"].includes(key)) {
       if (parseInt(val, 16) === 0) {
         val = "0x";
       }
     }
 
-    // Pad hex for proper Bytes parsing
+    // Pad hex for proper Bytes parsing.
     if (val.length % 2 == 1) {
       val = val.substring(0, 2) + "0" + val.substring(2);
     }
@@ -92,6 +93,7 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
     blockHeaderInputs[key] = val;
   });
 
+  // RLP encode.
   let rlpEncodedHeader = ethers.utils.RLP.encode(
     Object.values(blockHeaderInputs)
   );
@@ -102,6 +104,8 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
   console.log("Mix hash", mixHash);
   console.log("RLP Derived Block Hash", derivedBlockHash);
   console.log("Actual Block Hash", hash);
+
+  // Sanity check.
   if (derivedBlockHash !== hash) {
     throw new Error(`Derived ${derivedBlockHash} doesn't match expected ${hash}`);
   }
@@ -109,12 +113,10 @@ const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
   rlpEncodedHeader = rlpEncodedHeader.replace("0x", ""); // Remove 0x prefix.
   const rlpHexEncodedHeader = [...rlpEncodedHeader].map((char) => parseInt(char, 16));
 
-  // Pad to 1112 bytes required by circom circuit.
+  // Pad to length 1112 required by circom circuit.
   const padLen = 1112 - rlpHexEncodedHeader.length;
   for (let i = 0; i<padLen; i++) {
-    if (padLen > 0) {
-      rlpHexEncodedHeader.push(0);
-    }
+    rlpHexEncodedHeader.push(0);
   }
 
   return rlpHexEncodedHeader;
