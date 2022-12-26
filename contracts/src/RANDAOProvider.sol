@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.16;
 
 import {Owned} from "solmate/auth/Owned.sol";
 import {LibString} from "solmate/utils/LibString.sol";
@@ -236,17 +236,13 @@ contract RANDAOProvider is Owned, IRandomnessProvider {
     function requestRandomness() external returns (uint256) {
         // Batch randomness request to a future block based
         // on ROUNDING_CONSTANT and MIN_LOOKAHEAD_BUFFER.
-        uint256 minBlockNum = block.number + MIN_LOOKAHEAD_BUFFER;
-        uint256 futureDelta = ROUNDING_CONSTANT -
-            (minBlockNum % ROUNDING_CONSTANT);
-        if (futureDelta == ROUNDING_CONSTANT) {
-            futureDelta = 0;
+        uint256 targetBlock = block.number + MIN_LOOKAHEAD_BUFFER;
+        if (targetBlock % ROUNDING_CONSTANT != 0) {
+            targetBlock += ROUNDING_CONSTANT - (targetBlock % ROUNDING_CONSTANT);
         }
-        uint256 targetBlock = minBlockNum + futureDelta;
 
         emit RandomnessRequested(msg.sender, targetBlock);
-
-        return minBlockNum + futureDelta;
+        return targetBlock;
     }
 
     /// @notice Function to be called when a user requests randomness.

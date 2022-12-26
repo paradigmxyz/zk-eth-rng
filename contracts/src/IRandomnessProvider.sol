@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.16;
 
 import "./IBlockhashOracle.sol";
 
@@ -24,7 +24,7 @@ interface IRandomnessProvider {
     function requestRandomness() external returns (uint256);
 
     /// @notice Requests randomness from a specific block.
-    function requestRandomnessFromBlock(uint256 block) external;
+    function requestRandomnessFromBlock(uint256 blockNum) external;
 
     /// @notice Returns >= 1 random values from a specific block.
     function fetchRandomness(uint256 blockNum, uint256 numberRandomValues)

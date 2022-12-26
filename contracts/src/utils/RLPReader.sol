@@ -4,7 +4,7 @@
  * @author Hamdi Allam hamdi.allam97@gmail.com
  * Please reach out with any questions or concerns
  **/
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.16;
 
 library RLPReader {
     uint8 constant STRING_SHORT_START = 0x80;

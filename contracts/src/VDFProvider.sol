@@ -1,13 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.16;
 
 import {LibString} from "solmate/utils/LibString.sol";
 
 import {IFactRegistry} from "./vdf/IFactRegistry.sol";
 import {IRandomnessProvider} from "./IRandomnessProvider.sol";
-import {RANDAOProvider} from "./RANDAOProvider.sol";
-import {RLPReader} from "./utils/RLPReader.sol";
-
 
 /// @title Veedo VDF Provider Reference Implementation
 /// @notice This is an EXAMPLE contract of how to implement a VDF based
@@ -30,7 +27,7 @@ contract VDFProvider is IRandomnessProvider {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice The following are relevant constants for the Veedo VDF.
-    uint256 internal immutable n_iterations;
+    uint256 internal immutable nIterations;
     uint256 internal constant PUBLIC_INPUT_SIZE = 5;
     uint256 internal constant OFFSET_LOG_TRACE_LENGTH = 0;
     uint256 internal constant OFFSET_VDF_OUTPUT_X = 1;
@@ -79,10 +76,10 @@ contract VDFProvider is IRandomnessProvider {
 
     /// @notice Sets RANDAO provider contract address.
     /// @param _randaoProvider Address of RANDAO provider contract.
-    constructor(IFactRegistry _factRegistry, RANDAOProvider _randaoProvider, uint256 _n_iterations) {
+    constructor(IFactRegistry _factRegistry, IRandomnessProvider _randaoProvider, uint256 _nIterations) {
         verifierContract = _factRegistry;
-        randaoProvider = _randaoProvider;
-        n_iterations = _n_iterations;
+        randaoProvider = _randaoProvider; // Must be a RANDAO randomnes provider.
+        nIterations = _nIterations;
     }
 
     function submitVDFRandomness(
@@ -101,7 +98,7 @@ contract VDFProvider is IRandomnessProvider {
             "VDF reported length exceeds the integer overflow protection limit."
         );
         require(
-            n_iterations == 10 * 2**proofPublicInput[OFFSET_LOG_TRACE_LENGTH] - 1,
+            nIterations == 10 * 2**proofPublicInput[OFFSET_LOG_TRACE_LENGTH] - 1,
             "Public input and n_iterations are not compatible."
         );
         require(
@@ -145,14 +142,11 @@ contract VDFProvider is IRandomnessProvider {
     /// can be used to read the randomness value when it's posted by a prover.
     function requestRandomness() external returns (uint256) {
         // Batch randomness request to a future block based
-        // on ROUNDING_CONSTANT and MIN_LOOKAHEAD_BUFFER.
-        uint256 minBlockNum = block.number;
-        uint256 futureDelta = ROUNDING_CONSTANT -
-            (block.number % ROUNDING_CONSTANT);
-        if (futureDelta == ROUNDING_CONSTANT) {
-            futureDelta = 0;
+        // on ROUNDING_CONSTANT.
+        uint256 targetBlock = block.number;
+        if (targetBlock % ROUNDING_CONSTANT != 0) {
+            targetBlock += ROUNDING_CONSTANT - (targetBlock % ROUNDING_CONSTANT);
         }
-        uint256 targetBlock = minBlockNum + futureDelta;
 
         emit RandomnessRequested(msg.sender, targetBlock);
         return targetBlock;
