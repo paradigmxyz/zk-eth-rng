@@ -222,6 +222,12 @@ contract RANDAOOracleTest is Test {
                 uint256(keccak256(abi.encodePacked(randomValues[i - 1])))
             );
         }
+
+        for (uint256 i = 0; i < numRandomValues; i++) {
+            for (uint256 j = i+1; j < numRandomValues; j++) {
+                assertTrue(randomValues[i] != randomValues[j]);
+            }
+        }
     }
 
     /// @notice Tests that we can't fetch randomness if RANDAO value
