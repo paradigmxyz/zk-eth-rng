@@ -9,11 +9,27 @@ import "../src/BlockhashOpcodeOracle.sol";
 contract BlockhashOpcodeOracleTest is Test {
     BlockhashOpcodeOracle blockhashOracle;
 
+    /// Emits the validated block number and block hash.
+    event BlockhashValidated(uint256 indexed blockNum, bytes32 indexed blockHash);
+
     /*//////////////////////////////////////////////////////////////
                                   SETUP
     //////////////////////////////////////////////////////////////*/
     function setUp() public {
         blockhashOracle = new BlockhashOpcodeOracle();
+    }
+
+    /// @notice Tests that the constructor pokes the blockhash of the previous block.
+    function testConstructorPoke() public { 
+        vm.roll(100);
+        bytes32 pokedBlockhash = blockhash(99);
+
+        // Expect randomness availability event.
+        vm.expectEmit(true, true, false, false);
+        emit BlockhashValidated(99, pokedBlockhash);
+
+        BlockhashOpcodeOracle oracle = new BlockhashOpcodeOracle();
+        assertEq(oracle.blockHashToNumber(pokedBlockhash), 99);
     }
 
     /// @notice Tests that poking attests to the previous block's block hash.

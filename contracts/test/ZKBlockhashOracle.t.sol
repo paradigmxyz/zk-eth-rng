@@ -93,7 +93,7 @@ contract ZKBlockhashOracleTest is Test {
         zkBlockhashOracle.verifyParentHash(proofA, proofB, proofC, proofPublicInputs);
     }
 
-    function testCannotVerifyWithIncorrectProof(uint256[2] memory a, uint256[2][2] memory b, uint256[2] memory c) public {  
+    function testCannotVerifyIncorrectProof(uint256[2] memory a, uint256[2][2] memory b, uint256[2] memory c) public {  
         uint256 testBlock = proofBlockNumber + 100;
         vm.roll(testBlock);
 

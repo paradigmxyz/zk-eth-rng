@@ -69,6 +69,6 @@ template SingleEthBlockHashHex() {
     for (var idx = 0; idx < 6; idx++) {
         blockNumber[idx] <== rlp.fields[8][idx];
     }
- }
+}
 
 component main = SingleEthBlockHashHex();

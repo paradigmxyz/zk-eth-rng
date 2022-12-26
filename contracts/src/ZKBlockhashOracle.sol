@@ -1,9 +1,13 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
 
 import "./IBlockhashOracle.sol";
 import "./SingleBlockHeaderVerifier.sol";
 
+/// @title Single block ZK Blockhash Oracle
+/// @author AmanGotchu <aman@paradigm.xyz>
+/// @author Sina Sabet <sina@paradigm.xyz>
+/// @notice ZK based blockhash oracle that proves the parent hash of an already verified block. 
 contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     /// @notice Maps validated blockhashes to their block number.
     mapping(bytes32 => uint256) public blockhashToBlockNum;
@@ -15,7 +19,6 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     error PokeRangeError();
     error InvalidProof();
     error BlockhashUnvalidated(bytes32 blockHash);
-    error LinksUnavailable(bytes32 blockHash, uint256 blockNum);
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -60,30 +63,20 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     function setValidBlockhash(bytes32 blockHash, uint256 blockNum) internal {
         blockhashToBlockNum[blockHash] = blockNum;
 
-        emit BlockhashValidated(blockHash);
+        emit BlockhashValidated(blockNum, blockHash);
     }
-
+    
+    /// @notice Verifies a proof attesting to a parent blockhash of a block that has already been validated.
+    /// @param a Proof a value.
+    /// @param b Proof b value.
+    /// @param c Proof c value.
+    /// @param publicInputs Proof's public inputs (blockHash, parentHash, blockNum).
     function verifyParentHash(
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
         uint256[198] memory publicInputs
     ) public returns (bool) {
-        // Extract the hash first and verify it's been validated
-        
-        /*
-            We can only attest to a proof under specific conditions.
-            1. We need to submit a proof for a blockhash that is already attested to.
-                - This helps us attest to parent blockhashes.
-                - We don't need an RLP decoding scheme
-                - We need to poke so we have a blockhash to work off of
-                - Then submit a proof for that blockhash so we can attest to the parenthash of that block
-                - Then the cycle continues
-
-                - Just need poke + proof
-            2. 
-        */
-
         /// Parse relevant information from the proof's public inputs.
         // First 32 bytes are the anchored block hash.
         uint256 i = 0;

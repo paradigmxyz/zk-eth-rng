@@ -6,9 +6,7 @@ import "./IBlockhashOracle.sol";
 /// @title Blockhash Opcode Oracle
 /// @author AmanGotchu <aman@paradigm.xyz>
 /// @author Sina Sabet <sina@paradigm.xyz>
-/// @notice Blockhash oracle that uses the blockhash opcode.
-/// This contract allows us to pin blockhashes > 256 blocks
-/// in the past which the blockhash opcode does not support.
+/// @notice Blockhash opcode based blockhash oracle.
 contract BlockhashOpcodeOracle is IBlockhashOracle {
     /// @notice Maps validated blockhashes to their block number.
     mapping(bytes32 => uint256) public blockhashToBlockNum;
@@ -62,6 +60,6 @@ contract BlockhashOpcodeOracle is IBlockhashOracle {
     function setValidBlockhash(bytes32 blockHash, uint256 blockNum) internal {
         blockhashToBlockNum[blockHash] = blockNum;
 
-        emit BlockhashValidated(blockHash);
+        emit BlockhashValidated(blockNum, blockHash);
     }
 }

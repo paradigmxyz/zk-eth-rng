@@ -31,7 +31,7 @@ contract RANDAOOracleTest is Test {
     );
 
     // Randomness available for use event from randomness provider.
-    event RandomnessAvailable(
+    event RandomnessFulfilled(
         uint256 indexed fulfilledBlock,
         uint256 randomSeed
     );
@@ -47,6 +47,23 @@ contract RANDAOOracleTest is Test {
         // Only testing blocknums that we have blockdata json files for.
         blockNums.push(15537394);
         blockNums.push(15537395);
+    }
+
+
+    /*//////////////////////////////////////////////////////////////
+                                CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+    
+    /// @notice Tests that the constructor pokes the blockhash of the previous block.
+    function testConstructorPoke() public { 
+        vm.roll(100);
+        uint256 pokedRANDAO = block.difficulty;
+
+        vm.expectEmit(true, false, false, true);
+        emit RandomnessFulfilled(100, pokedRANDAO);
+
+        RANDAOProvider provider = new RANDAOProvider(blockhashOracle);
+        assertEq(provider.blockNumToRANDAO(100), pokedRANDAO);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -152,7 +169,7 @@ contract RANDAOOracleTest is Test {
 
             // Expect randomness availability event.
             vm.expectEmit(true, false, false, false, address(randomProvider));
-            emit RandomnessAvailable(blockNum, 1);
+            emit RandomnessFulfilled(blockNum, 1);
 
             // Attempt to submit a single RANDAO value.
             uint256 derivedRANDAO = randomProvider.submitRANDAO(rlp);
@@ -284,31 +301,6 @@ contract RANDAOOracleTest is Test {
         expectedHash = json.readBytes32(".goldenHash");
         rlp = json.readBytes(".rlp");
         mixHash = json.readBytes32(".cleanedHeaderFields.mixHash");
-    }
-
-    /// @notice Read the VDF proof data from JSON in the repo to use for testing.
-    function readVDFDataFile(uint256 blockNum)
-        public
-        returns (
-            bytes memory proof,
-            bytes32 blockHash,
-            bytes32 vdfOutput
-        )
-    {
-        string memory root = vm.projectRoot();
-        string memory path = string.concat(
-            root,
-            "/testdata/vdf/",
-            LibString.toString(blockNum),
-            ".json"
-        );
-        string memory json = vm.readFile(path);
-
-        proof = json.readBytes(".proof");
-        console2.logBytes(proof);
-
-        blockHash = json.readBytes32(".blockHash");
-        vdfOutput = json.readBytes32(".vdfOutput");
     }
 
     /// @notice Mocks the block hash oracle's response for a validity check.

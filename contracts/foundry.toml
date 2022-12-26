@@ -5,10 +5,9 @@ libs = ['lib']
 fs_permissions = [
     { access = "read", path = "testdata/blockhashmerkleleaves"},
     { access = "read", path = "testdata/blockheaderinfo"},
-    { access = "read", path = "testdata/vdf"}
 ]
 
 [fuzz]
-runs = 50
+runs = 1000
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
