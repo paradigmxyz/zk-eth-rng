@@ -244,15 +244,15 @@ contract ZKBlockhashOracleTest is Test {
         zkBlockhashOracle = new ZKBlockhashOracle();
     }
 
-    /// @notice Tests that a proof validates  within blockhash opcode range.
+    /// @notice Tests that a proof validates within blockhash opcode range.
     function testCanVerifyValidProofInBlockhashOpcodeRange() public {
         uint256 testBlock = proofBlockNumber + 256;
         vm.roll(testBlock);
 
         // Both proof's block hash and parent blockhash are not be verified before the proof.
-        uint256 unverifiedBlockNumber = zkBlockhashOracle.blockHashToNumber(proofBlockHash);
+        uint256 unverifiedBlockNumber = zkBlockhashOracle.blockhashToBlockNum(proofBlockHash);
         assertEq(unverifiedBlockNumber, 0);
-        uint256 unVerifiedParentBlockNumber = zkBlockhashOracle.blockHashToNumber(proofParentHash);
+        uint256 unVerifiedParentBlockNumber = zkBlockhashOracle.blockhashToBlockNum(proofParentHash);
         assertEq(unVerifiedParentBlockNumber, 0);
 
         // TODO(aman): Figure out how to mock blockhash opcode itself instead of contract storage.
@@ -263,9 +263,9 @@ contract ZKBlockhashOracleTest is Test {
         assertTrue(verified);
 
         // Both proof's block hash and parent blockhash are verified.
-        uint256 verifiedBlockNumber = zkBlockhashOracle.blockHashToNumber(proofBlockHash);
+        uint256 verifiedBlockNumber = zkBlockhashOracle.blockhashToBlockNum(proofBlockHash);
         assertTrue(verifiedBlockNumber != 0); // TODO(aman): Change this after mocking blockhash opcode.
-        uint256 verifiedParentBlockNumber = zkBlockhashOracle.blockHashToNumber(proofParentHash);
+        uint256 verifiedParentBlockNumber = zkBlockhashOracle.blockhashToBlockNum(proofParentHash);
         assertEq(verifiedParentBlockNumber, proofBlockNumber - 1);
     }
 
@@ -308,7 +308,7 @@ contract ZKBlockhashOracleTest is Test {
 
     /// @notice Mocks the block hash oracle's response for a validity check.
     function mockBlockhashOracle(bytes32 blockHash, uint256 response) internal {
-        stdstore.target(address(zkBlockhashOracle)).sig("blockHashToNumber(bytes32)").with_key(blockHash).checked_write(
+        stdstore.target(address(zkBlockhashOracle)).sig("blockhashToBlockNum(bytes32)").with_key(blockHash).checked_write(
             response
         );
     }

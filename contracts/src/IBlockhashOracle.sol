@@ -11,5 +11,5 @@ interface IBlockhashOracle {
 
     /// @notice Returns the nonzero, accurate block number
     /// if the block hash is validated!.
-    function blockHashToNumber(bytes32 hash) external view returns (uint256);
+    function blockhashToBlockNum(bytes32 hash) external view returns (uint256);
 }
