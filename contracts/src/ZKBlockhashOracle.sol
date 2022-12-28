@@ -2,21 +2,18 @@
 pragma solidity ^0.8.16;
 
 import "./IBlockhashOracle.sol";
+import "./BlockhashOpcodeOracle.sol";
 import "./SingleBlockHeaderVerifier.sol";
 
 /// @title Single block ZK Blockhash Oracle
 /// @author AmanGotchu <aman@paradigm.xyz>
 /// @author Sina Sabet <sina@paradigm.xyz>
 /// @notice ZK based blockhash oracle that proves the parent hash of an already verified block.
-contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
-    /// @notice Maps validated blockhashes to their block number.
-    mapping(bytes32 => uint256) public blockhashToBlockNum;
-
+contract ZKBlockhashOracle is BlockhashOpcodeOracle, SingleBlockHeaderVerifier {
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
 
-    error PokeRangeError();
     error InvalidProof();
     error BlockhashUnvalidated(bytes32 blockHash);
 
@@ -27,43 +24,6 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     /// @notice Validates the block hash of the block before the contract was initialized.
     constructor() {
         poke();
-    }
-
-    /// @notice Returns the block number of a validated block hash.
-    /// This doubles as a block hash verifier and a block number oracle.
-    /// @param hash Blockhash being verified.
-    function blockHashToNumber(bytes32 hash) external view returns (uint256) {
-        return blockhashToBlockNum[hash];
-    }
-
-    /// @notice Validates the block hash of the block before this tx is called.
-    function poke() public {
-        uint256 prevBlockNum = block.number - 1;
-        setValidBlockhash(blockhash(prevBlockNum), prevBlockNum);
-    }
-
-    /// @notice Validates the block hash of a specified block number using
-    /// the blockhash opcode. The blockhash opcode is currently limited to
-    /// 256 blocks in the past. There have been discussions of EIPs that
-    /// allow for arbitrary blockhash lookback which makes this blockhash
-    /// oracle approach far better.
-    /// @param blockNum Block number to validate.
-    function pokeBlocknum(uint256 blockNum) public {
-        bytes32 blockhashVal = blockhash(blockNum);
-        if (blockhashVal == bytes32(0)) {
-            revert PokeRangeError();
-        }
-
-        setValidBlockhash(blockhashVal, blockNum);
-    }
-
-    /// @notice Validates blockhash and blocknum in storage and emits a validated event.
-    /// @param blockNum Block number of the blockhash being validated.
-    /// @param blockHash Blockhash being validated.
-    function setValidBlockhash(bytes32 blockHash, uint256 blockNum) internal {
-        blockhashToBlockNum[blockHash] = blockNum;
-
-        emit BlockhashValidated(blockNum, blockHash);
     }
 
     /// @notice Verifies a proof attesting to a parent blockhash of a block that has already been validated.
