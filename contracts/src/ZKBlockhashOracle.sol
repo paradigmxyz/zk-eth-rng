@@ -7,7 +7,7 @@ import "./SingleBlockHeaderVerifier.sol";
 /// @title Single block ZK Blockhash Oracle
 /// @author AmanGotchu <aman@paradigm.xyz>
 /// @author Sina Sabet <sina@paradigm.xyz>
-/// @notice ZK based blockhash oracle that proves the parent hash of an already verified block. 
+/// @notice ZK based blockhash oracle that proves the parent hash of an already verified block.
 contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
     /// @notice Maps validated blockhashes to their block number.
     mapping(bytes32 => uint256) public blockhashToBlockNum;
@@ -38,7 +38,7 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
 
     /// @notice Validates the block hash of the block before this tx is called.
     function poke() public {
-        uint256 prevBlockNum = block.number-1;
+        uint256 prevBlockNum = block.number - 1;
         setValidBlockhash(blockhash(prevBlockNum), prevBlockNum);
     }
 
@@ -65,7 +65,7 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
 
         emit BlockhashValidated(blockNum, blockHash);
     }
-    
+
     /// @notice Verifies a proof attesting to a parent blockhash of a block that has already been validated.
     /// @param a Proof a value.
     /// @param b Proof b value.
@@ -122,7 +122,7 @@ contract ZKBlockhashOracle is IBlockhashOracle, SingleBlockHeaderVerifier {
             revert InvalidProof();
         }
 
-        setValidBlockhash(parentHash, blockNum-1);
+        setValidBlockhash(parentHash, blockNum - 1);
         return true;
     }
 }

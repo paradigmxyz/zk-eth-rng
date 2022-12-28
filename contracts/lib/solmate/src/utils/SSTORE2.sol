@@ -30,7 +30,7 @@ library SSTORE2 {
             // 0x39    |  0x39               | CODECOPY     | 0 (codeSize - codeOffset)                                      //
             // 0xf3    |  0xf3               | RETURN       |                                                                //
             //---------------------------------------------------------------------------------------------------------------//
-            hex"60_0B_59_81_38_03_80_92_59_39_F3", // Returns all code in the contract except for the first 11 (0B in hex) bytes.
+            hex"600B5981380380925939F3", // Returns all code in the contract except for the first 11 (0B in hex) bytes.
             runtimeCode // The bytecode we want the contract to have after deployment. Capped at 1 byte less than the code size limit.
         );
 
@@ -58,11 +58,7 @@ library SSTORE2 {
         return readBytecode(pointer, start, pointer.code.length - start);
     }
 
-    function read(
-        address pointer,
-        uint256 start,
-        uint256 end
-    ) internal view returns (bytes memory) {
+    function read(address pointer, uint256 start, uint256 end) internal view returns (bytes memory) {
         start += DATA_OFFSET;
         end += DATA_OFFSET;
 
@@ -75,11 +71,7 @@ library SSTORE2 {
                           INTERNAL HELPER LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function readBytecode(
-        address pointer,
-        uint256 start,
-        uint256 size
-    ) private view returns (bytes memory data) {
+    function readBytecode(address pointer, uint256 start, uint256 size) private view returns (bytes memory data) {
         /// @solidity memory-safe-assembly
         assembly {
             // Get a pointer to some free memory.

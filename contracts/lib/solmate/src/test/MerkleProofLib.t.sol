@@ -40,11 +40,7 @@ contract MerkleProofLibTest is DSTestPlus {
         assertBoolEq(this.verify(proof, root, leaf), false);
     }
 
-    function verify(
-        bytes32[] calldata proof,
-        bytes32 root,
-        bytes32 leaf
-    ) external pure returns (bool) {
+    function verify(bytes32[] calldata proof, bytes32 root, bytes32 leaf) external pure returns (bool) {
         return MerkleProofLib.verify(proof, root, leaf);
     }
 }

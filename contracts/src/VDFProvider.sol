@@ -8,10 +8,10 @@ import {IRandomnessProvider} from "./IRandomnessProvider.sol";
 
 /// @title Veedo VDF Provider Reference Implementation
 /// @notice This is an EXAMPLE contract of how to implement a VDF based
-///         randomness provider using Starkware's Veedo VDF. It is NOT suited for 
+///         randomness provider using Starkware's Veedo VDF. It is NOT suited for
 ///         production use since Veedo isn't public.
-///         
-///         Credit: 
+///
+///         Credit:
 ///         This contract was heavily influenced by the Starkware contracts and sources
 ///         referenced below.
 ///
@@ -41,7 +41,7 @@ contract VDFProvider is IRandomnessProvider {
     /// randomness requests to the closest multiple of ROUNDING_CONSTANT
     /// in the future. Routing users to the same block allows
     /// a single proof to service multiple users.
-    /// This is an arbitrary rounding constant and 
+    /// This is an arbitrary rounding constant and
     /// should be influenced by the VDF time.
     uint256 public constant ROUNDING_CONSTANT = 10;
 
@@ -88,22 +88,18 @@ contract VDFProvider is IRandomnessProvider {
         uint256[PUBLIC_INPUT_SIZE] calldata proofPublicInput
     ) external {
         // Verify this is a valid ranDAO for this block number
-        require(
-            randaoProvider.fetchRandomness(blockNumber, 1)[0] == randao,
-            "Invalid randao for this block."
-        );
+        require(randaoProvider.fetchRandomness(blockNumber, 1)[0] == randao, "Invalid randao for this block.");
 
         require(
             proofPublicInput[OFFSET_LOG_TRACE_LENGTH] < MAX_LOG_TRACE_LENGTH,
             "VDF reported length exceeds the integer overflow protection limit."
         );
         require(
-            nIterations == 10 * 2**proofPublicInput[OFFSET_LOG_TRACE_LENGTH] - 1,
+            nIterations == 10 * 2 ** proofPublicInput[OFFSET_LOG_TRACE_LENGTH] - 1,
             "Public input and n_iterations are not compatible."
         );
         require(
-            proofPublicInput[OFFSET_VDF_OUTPUT_X] < PRIME &&
-                proofPublicInput[OFFSET_VDF_OUTPUT_Y] < PRIME,
+            proofPublicInput[OFFSET_VDF_OUTPUT_X] < PRIME && proofPublicInput[OFFSET_VDF_OUTPUT_Y] < PRIME,
             "Invalid vdf output."
         );
 
@@ -118,18 +114,13 @@ contract VDFProvider is IRandomnessProvider {
             ((vdfInput >> 125) & ((1 << 125) - 1)) == proofPublicInput[OFFSET_VDF_INPUT_Y],
             "randao does not match the given proofPublicInput."
         );
-        require(
-            verifierContract.isValid(keccak256(abi.encodePacked(proofPublicInput))),
-            "No valid proof provided."
-        );
+        require(verifierContract.isValid(keccak256(abi.encodePacked(proofPublicInput))), "No valid proof provided.");
         // The randomness is the hash of the VDF output and the string "veedo"
-        uint256 randomness = uint256(keccak256(
-            abi.encodePacked(
-                proofPublicInput[OFFSET_VDF_OUTPUT_X],
-                proofPublicInput[OFFSET_VDF_OUTPUT_Y],
-                "veedo"
+        uint256 randomness = uint256(
+            keccak256(
+                abi.encodePacked(proofPublicInput[OFFSET_VDF_OUTPUT_X], proofPublicInput[OFFSET_VDF_OUTPUT_Y], "veedo")
             )
-        ));
+        );
 
         blockNumToVDFRandomness[blockNumber] = randomness;
         emit RandomnessFulfilled(blockNumber, randomness);
@@ -167,16 +158,12 @@ contract VDFProvider is IRandomnessProvider {
         emit RandomnessRequested(msg.sender, targetBlockNum);
     }
 
-    /// @notice Fetch the VDF generated random value tied to a specific block 
-    /// with option to generate more random values using the initial RANDAO value 
+    /// @notice Fetch the VDF generated random value tied to a specific block
+    /// with option to generate more random values using the initial RANDAO value
     /// as a seed.
     /// @param blockNum Block number to fetch randomness from.
     /// @param numberRandomValues Number of random values returned.
-    function fetchRandomness(uint256 blockNum, uint256 numberRandomValues)
-        public
-        view
-        returns (uint256[] memory)
-    {
+    function fetchRandomness(uint256 blockNum, uint256 numberRandomValues) public view returns (uint256[] memory) {
         uint256 randomness = blockNumToVDFRandomness[blockNum];
 
         // Ensure RANDAO value is proven AND user isn't trying to fetch
@@ -197,11 +184,7 @@ contract VDFProvider is IRandomnessProvider {
     /// View disclaimer about how the random seed (RANDAO) is generated in function above!
     /// @param seed Initial value to base the rest of the random values on.
     /// @param numRandomValues Number of values to return.
-    function generateMoreRandomValues(uint256 seed, uint256 numRandomValues)
-        internal
-        pure
-        returns (uint256[] memory)
-    {
+    function generateMoreRandomValues(uint256 seed, uint256 numRandomValues) internal pure returns (uint256[] memory) {
         uint256[] memory res = new uint256[](numRandomValues);
         uint256 iter = seed;
 

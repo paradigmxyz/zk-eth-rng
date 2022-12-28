@@ -18,23 +18,16 @@ contract RANDAOOracleTest is Test {
 
     uint256[] public blockNums;
 
-    uint256 constant mockRANDAO =
-        74959964106633704346858077179036090420725799257578598593094705978576627503466;
+    uint256 constant mockRANDAO = 74959964106633704346858077179036090420725799257578598593094705978576627503466;
 
     // Blockhash oracle upgrade event from randomness provider.
     event BlockhashOracleUpgraded(address, address);
 
     // Randomness Requested event from randomness provider.
-    event RandomnessRequested(
-        address indexed requester,
-        uint256 indexed requestedBlock
-    );
+    event RandomnessRequested(address indexed requester, uint256 indexed requestedBlock);
 
     // Randomness available for use event from randomness provider.
-    event RandomnessFulfilled(
-        uint256 indexed fulfilledBlock,
-        uint256 randomSeed
-    );
+    event RandomnessFulfilled(uint256 indexed fulfilledBlock, uint256 randomSeed);
 
     /*//////////////////////////////////////////////////////////////
                                   SETUP
@@ -49,13 +42,12 @@ contract RANDAOOracleTest is Test {
         blockNums.push(15537395);
     }
 
-
     /*//////////////////////////////////////////////////////////////
                                 CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
-    
+
     /// @notice Tests that the constructor pokes the blockhash of the previous block.
-    function testConstructorPoke() public { 
+    function testConstructorPoke() public {
         vm.roll(100);
         uint256 pokedRANDAO = block.difficulty;
 
@@ -75,10 +67,8 @@ contract RANDAOOracleTest is Test {
     /// a multiple of ROUNDING_CONSTANT.
     function testRandomnessRequest(uint256 currentBlock) public {
         vm.assume(
-            currentBlock <
-                type(uint256).max -
-                    randomProvider.MIN_LOOKAHEAD_BUFFER() -
-                    randomProvider.ROUNDING_CONSTANT()
+            currentBlock
+                < type(uint256).max - randomProvider.MIN_LOOKAHEAD_BUFFER() - randomProvider.ROUNDING_CONSTANT()
         );
         vm.roll(currentBlock);
 
@@ -86,18 +76,14 @@ contract RANDAOOracleTest is Test {
 
         // Assert the retrieved block is greater or equal to
         // the current block + the minimum buffer lookahead.
-        assertGe(
-            randomnessBlock,
-            currentBlock + randomProvider.MIN_LOOKAHEAD_BUFFER()
-        );
+        assertGe(randomnessBlock, currentBlock + randomProvider.MIN_LOOKAHEAD_BUFFER());
 
         // Assert the retrieved blocks is a multiple of the rounding
         // constant.
         assertEq(0, randomnessBlock % randomProvider.ROUNDING_CONSTANT());
 
         // Assert that retrieved block is isn't too far in the future.
-        uint256 maxDistance = randomProvider.ROUNDING_CONSTANT() +
-            randomProvider.MIN_LOOKAHEAD_BUFFER();
+        uint256 maxDistance = randomProvider.ROUNDING_CONSTANT() + randomProvider.MIN_LOOKAHEAD_BUFFER();
         assertLt(randomnessBlock - currentBlock, maxDistance);
     }
 
@@ -111,18 +97,11 @@ contract RANDAOOracleTest is Test {
     }
 
     /// @notice Tests that randomness cannot be requested for the current block.
-    function testCannotRequestRandomnessForCurrentOrPastBlock(uint256 blockNum)
-        public
-    {
+    function testCannotRequestRandomnessForCurrentOrPastBlock(uint256 blockNum) public {
         vm.roll(200);
         vm.assume(blockNum <= 200);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                RANDAOProvider.RequestedRandomnessFromPast.selector,
-                200
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(RANDAOProvider.RequestedRandomnessFromPast.selector, 200));
 
         randomProvider.requestRandomnessFromBlock(200);
     }
@@ -151,15 +130,8 @@ contract RANDAOOracleTest is Test {
     /// extract and attest to the RANDAO value when blockhash is
     /// validated and that it won't attest if blockhash hasn't
     /// been validated yet.
-    function internalRecoverVerifiedRANDAOValue(
-        uint256 blockNum,
-        bool validBlockhash
-    ) internal {
-        (
-            bytes32 expectedHash,
-            bytes memory rlp,
-            bytes32 expectedRANDAO
-        ) = readBlockDataFile(blockNum);
+    function internalRecoverVerifiedRANDAOValue(uint256 blockNum, bool validBlockhash) internal {
+        (bytes32 expectedHash, bytes memory rlp, bytes32 expectedRANDAO) = readBlockDataFile(blockNum);
         // Sanity check, RLP matches expected hash.
         assertEq(keccak256(rlp), expectedHash);
 
@@ -179,18 +151,12 @@ contract RANDAOOracleTest is Test {
 
             // Verify RANDAO value exists and can be fetched in the future.
             vm.roll(blockNum + 1);
-            uint256[] memory fetchedRandomValues = randomProvider
-                .fetchRandomness(blockNum, 1);
+            uint256[] memory fetchedRandomValues = randomProvider.fetchRandomness(blockNum, 1);
             assertEq(bytes32(fetchedRandomValues[0]), expectedRANDAO);
         } else {
             mockOracle(expectedHash, 0);
 
-            vm.expectRevert(
-                abi.encodeWithSelector(
-                    RANDAOProvider.BlockhashUnverified.selector,
-                    keccak256(rlp)
-                )
-            );
+            vm.expectRevert(abi.encodeWithSelector(RANDAOProvider.BlockhashUnverified.selector, keccak256(rlp)));
 
             // Submit a single RANDAO value, expecting function to revert.
             randomProvider.submitRANDAO(rlp);
@@ -208,23 +174,17 @@ contract RANDAOOracleTest is Test {
         uint256 blockNum = 100;
         mockRANDAOAtBlock(blockNum, mockRANDAO);
 
-        uint256[] memory randomValues = randomProvider.fetchRandomness(
-            blockNum,
-            numRandomValues
-        );
+        uint256[] memory randomValues = randomProvider.fetchRandomness(blockNum, numRandomValues);
 
         assertEq(randomValues.length, numRandomValues);
         assertEq(randomValues[0], mockRANDAO);
 
         for (uint256 i = 1; i < numRandomValues; i++) {
-            assertEq(
-                randomValues[i],
-                uint256(keccak256(abi.encodePacked(randomValues[i - 1])))
-            );
+            assertEq(randomValues[i], uint256(keccak256(abi.encodePacked(randomValues[i - 1]))));
         }
 
         for (uint256 i = 0; i < numRandomValues; i++) {
-            for (uint256 j = i+1; j < numRandomValues; j++) {
+            for (uint256 j = i + 1; j < numRandomValues; j++) {
                 assertTrue(randomValues[i] != randomValues[j]);
             }
         }
@@ -236,12 +196,7 @@ contract RANDAOOracleTest is Test {
         uint256 blockNum = 100;
         mockRANDAOAtBlock(blockNum, 0);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                RANDAOProvider.RandomnessNotAvailable.selector,
-                blockNum
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(RANDAOProvider.RandomnessNotAvailable.selector, blockNum));
 
         randomProvider.fetchRandomness(blockNum, 1);
     }
@@ -288,20 +243,12 @@ contract RANDAOOracleTest is Test {
 
     /// @notice Reads the block data from JSON in the repo to use for testing.
     function readBlockDataFile(uint256 blockNum)
-        public
-        returns (
-            bytes32 expectedHash,
-            bytes memory rlp,
-            bytes32 mixHash
-        )
+        public 
+        view
+        returns (bytes32 expectedHash, bytes memory rlp, bytes32 mixHash)
     {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(
-            root,
-            "/testdata/blockheaderinfo/",
-            LibString.toString(blockNum),
-            ".json"
-        );
+        string memory path = string.concat(root, "/testdata/blockheaderinfo/", LibString.toString(blockNum), ".json");
         string memory json = vm.readFile(path);
 
         expectedHash = json.readBytes32(".goldenHash");
@@ -311,19 +258,15 @@ contract RANDAOOracleTest is Test {
 
     /// @notice Mocks the block hash oracle's response for a validity check.
     function mockOracle(bytes32 blockHash, uint256 response) internal {
-        stdstore
-            .target(address(blockhashOracle))
-            .sig("blockHashToNumber(bytes32)")
-            .with_key(blockHash)
-            .checked_write(response);
+        stdstore.target(address(blockhashOracle)).sig("blockHashToNumber(bytes32)").with_key(blockHash).checked_write(
+            response
+        );
     }
 
     /// @notice Mocks the RANDAO value for a block.
     function mockRANDAOAtBlock(uint256 blockNumber, uint256 RANDAO) internal {
-        stdstore
-            .target(address(randomProvider))
-            .sig("blockNumToRANDAO(uint256)")
-            .with_key(blockNumber)
-            .checked_write(RANDAO);
+        stdstore.target(address(randomProvider)).sig("blockNumToRANDAO(uint256)").with_key(blockNumber).checked_write(
+            RANDAO
+        );
     }
 }

@@ -39,7 +39,7 @@ library LibString {
                 // Keep dividing temp until zero.
                 temp := div(temp, 10)
 
-                 // prettier-ignore
+                // prettier-ignore
                 if iszero(temp) { break }
             }
 

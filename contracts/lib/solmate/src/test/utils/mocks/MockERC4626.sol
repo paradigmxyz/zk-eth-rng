@@ -8,11 +8,7 @@ contract MockERC4626 is ERC4626 {
     uint256 public beforeWithdrawHookCalledCounter = 0;
     uint256 public afterDepositHookCalledCounter = 0;
 
-    constructor(
-        ERC20 _underlying,
-        string memory _name,
-        string memory _symbol
-    ) ERC4626(_underlying, _name, _symbol) {}
+    constructor(ERC20 _underlying, string memory _name, string memory _symbol) ERC4626(_underlying, _name, _symbol) {}
 
     function totalAssets() public view override returns (uint256) {
         return asset.balanceOf(address(this));

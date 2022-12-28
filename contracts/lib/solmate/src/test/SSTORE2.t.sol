@@ -67,11 +67,10 @@ contract SSTORE2Test is DSTestPlus {
         assertBytesEq(SSTORE2.read(SSTORE2.write(testBytes)), testBytes);
     }
 
-    function testWriteReadCustomStartBound(
-        bytes calldata testBytes,
-        uint256 startIndex,
-        bytes calldata brutalizeWith
-    ) public brutalizeMemory(brutalizeWith) {
+    function testWriteReadCustomStartBound(bytes calldata testBytes, uint256 startIndex, bytes calldata brutalizeWith)
+        public
+        brutalizeMemory(brutalizeWith)
+    {
         if (testBytes.length == 0) return;
 
         startIndex = bound(startIndex, 0, testBytes.length);
@@ -93,8 +92,7 @@ contract SSTORE2Test is DSTestPlus {
         if (startIndex > endIndex) return;
 
         assertBytesEq(
-            SSTORE2.read(SSTORE2.write(testBytes), startIndex, endIndex),
-            bytes(testBytes[startIndex:endIndex])
+            SSTORE2.read(SSTORE2.write(testBytes), startIndex, endIndex), bytes(testBytes[startIndex:endIndex])
         );
     }
 

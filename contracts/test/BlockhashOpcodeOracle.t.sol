@@ -20,7 +20,7 @@ contract BlockhashOpcodeOracleTest is Test {
     }
 
     /// @notice Tests that the constructor pokes the blockhash of the previous block.
-    function testConstructorPoke() public { 
+    function testConstructorPoke() public {
         vm.roll(100);
         bytes32 pokedBlockhash = blockhash(99);
 

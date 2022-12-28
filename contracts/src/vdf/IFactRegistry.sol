@@ -18,9 +18,8 @@ pragma solidity ^0.8.16;
     depending of the type of fact requiring verification.
 
     For further reading on the Fact Registry design pattern see this
-    `StarkWare blog post <https://medium.com/starkware/the-fact-registry-a64aafb598b6>`_.
-*/
+    `StarkWare blog post <https://medium.com/starkware/the-fact-registry-a64aafb598b6>`_.*/
 interface IFactRegistry {
     /// @notice Returns true if the given fact was previously registered in the contract.
-    function isValid(bytes32 fact) external view returns(bool);
+    function isValid(bytes32 fact) external view returns (bool);
 }

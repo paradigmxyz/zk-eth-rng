@@ -210,11 +210,7 @@ contract ERC20Test is DSTestPlus {
         token.permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
     }
 
-    function testMetadata(
-        string calldata name,
-        string calldata symbol,
-        uint8 decimals
-    ) public {
+    function testMetadata(string calldata name, string calldata symbol, uint8 decimals) public {
         MockERC20 tkn = new MockERC20(name, symbol, decimals);
         assertEq(tkn.name(), name);
         assertEq(tkn.symbol(), symbol);
@@ -228,11 +224,7 @@ contract ERC20Test is DSTestPlus {
         assertEq(token.balanceOf(from), amount);
     }
 
-    function testBurn(
-        address from,
-        uint256 mintAmount,
-        uint256 burnAmount
-    ) public {
+    function testBurn(address from, uint256 mintAmount, uint256 burnAmount) public {
         burnAmount = bound(burnAmount, 0, mintAmount);
 
         token.mint(from, mintAmount);
@@ -262,11 +254,7 @@ contract ERC20Test is DSTestPlus {
         }
     }
 
-    function testTransferFrom(
-        address to,
-        uint256 approval,
-        uint256 amount
-    ) public {
+    function testTransferFrom(address to, uint256 approval, uint256 amount) public {
         amount = bound(amount, 0, approval);
 
         address from = address(0xABCD);
@@ -290,12 +278,7 @@ contract ERC20Test is DSTestPlus {
         }
     }
 
-    function testPermit(
-        uint248 privKey,
-        address to,
-        uint256 amount,
-        uint256 deadline
-    ) public {
+    function testPermit(uint248 privKey, address to, uint256 amount, uint256 deadline) public {
         uint256 privateKey = privKey;
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
@@ -319,33 +302,21 @@ contract ERC20Test is DSTestPlus {
         assertEq(token.nonces(owner), 1);
     }
 
-    function testFailBurnInsufficientBalance(
-        address to,
-        uint256 mintAmount,
-        uint256 burnAmount
-    ) public {
+    function testFailBurnInsufficientBalance(address to, uint256 mintAmount, uint256 burnAmount) public {
         burnAmount = bound(burnAmount, mintAmount + 1, type(uint256).max);
 
         token.mint(to, mintAmount);
         token.burn(to, burnAmount);
     }
 
-    function testFailTransferInsufficientBalance(
-        address to,
-        uint256 mintAmount,
-        uint256 sendAmount
-    ) public {
+    function testFailTransferInsufficientBalance(address to, uint256 mintAmount, uint256 sendAmount) public {
         sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
 
         token.mint(address(this), mintAmount);
         token.transfer(to, sendAmount);
     }
 
-    function testFailTransferFromInsufficientAllowance(
-        address to,
-        uint256 approval,
-        uint256 amount
-    ) public {
+    function testFailTransferFromInsufficientAllowance(address to, uint256 approval, uint256 amount) public {
         amount = bound(amount, approval + 1, type(uint256).max);
 
         address from = address(0xABCD);
@@ -358,11 +329,7 @@ contract ERC20Test is DSTestPlus {
         token.transferFrom(from, to, amount);
     }
 
-    function testFailTransferFromInsufficientBalance(
-        address to,
-        uint256 mintAmount,
-        uint256 sendAmount
-    ) public {
+    function testFailTransferFromInsufficientBalance(address to, uint256 mintAmount, uint256 sendAmount) public {
         sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
 
         address from = address(0xABCD);
@@ -375,13 +342,9 @@ contract ERC20Test is DSTestPlus {
         token.transferFrom(from, to, sendAmount);
     }
 
-    function testFailPermitBadNonce(
-        uint256 privateKey,
-        address to,
-        uint256 amount,
-        uint256 deadline,
-        uint256 nonce
-    ) public {
+    function testFailPermitBadNonce(uint256 privateKey, address to, uint256 amount, uint256 deadline, uint256 nonce)
+        public
+    {
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
         if (nonce == 0) nonce = 1;
@@ -402,12 +365,7 @@ contract ERC20Test is DSTestPlus {
         token.permit(owner, to, amount, deadline, v, r, s);
     }
 
-    function testFailPermitBadDeadline(
-        uint256 privateKey,
-        address to,
-        uint256 amount,
-        uint256 deadline
-    ) public {
+    function testFailPermitBadDeadline(uint256 privateKey, address to, uint256 amount, uint256 deadline) public {
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
 
@@ -427,12 +385,7 @@ contract ERC20Test is DSTestPlus {
         token.permit(owner, to, amount, deadline + 1, v, r, s);
     }
 
-    function testFailPermitPastDeadline(
-        uint256 privateKey,
-        address to,
-        uint256 amount,
-        uint256 deadline
-    ) public {
+    function testFailPermitPastDeadline(uint256 privateKey, address to, uint256 amount, uint256 deadline) public {
         deadline = bound(deadline, 0, block.timestamp - 1);
         if (privateKey == 0) privateKey = 1;
 
@@ -452,12 +405,7 @@ contract ERC20Test is DSTestPlus {
         token.permit(owner, to, amount, deadline, v, r, s);
     }
 
-    function testFailPermitReplay(
-        uint256 privateKey,
-        address to,
-        uint256 amount,
-        uint256 deadline
-    ) public {
+    function testFailPermitReplay(uint256 privateKey, address to, uint256 amount, uint256 deadline) public {
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
 
@@ -517,11 +465,7 @@ contract BalanceSum {
         token.approve(to, amount);
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public {
+    function transferFrom(address from, address to, uint256 amount) public {
         token.transferFrom(from, to, amount);
     }
 

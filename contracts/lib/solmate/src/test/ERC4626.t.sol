@@ -237,8 +237,7 @@ contract ERC4626Test is DSTestPlus {
         assertEq(vault.totalAssets(), preMutationBal + mutationUnderlyingAmount);
         assertEq(vault.balanceOf(alice), aliceShareAmount);
         assertEq(
-            vault.convertToAssets(vault.balanceOf(alice)),
-            aliceUnderlyingAmount + (mutationUnderlyingAmount / 3) * 1
+            vault.convertToAssets(vault.balanceOf(alice)), aliceUnderlyingAmount + (mutationUnderlyingAmount / 3) * 1
         );
         assertEq(vault.balanceOf(bob), bobShareAmount);
         assertEq(vault.convertToAssets(vault.balanceOf(bob)), bobUnderlyingAmount + (mutationUnderlyingAmount / 3) * 2);

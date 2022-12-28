@@ -30,15 +30,11 @@ library CREATE3 {
     // 0x60       |  0x6018               | PUSH1 18         | 24 8                   //
     // 0xf3       |  0xf3                 | RETURN           |                        //
     //--------------------------------------------------------------------------------//
-    bytes internal constant PROXY_BYTECODE = hex"67_36_3d_3d_37_36_3d_34_f0_3d_52_60_08_60_18_f3";
+    bytes internal constant PROXY_BYTECODE = hex"67363d3d37363d34f03d5260086018f3";
 
     bytes32 internal constant PROXY_BYTECODE_HASH = keccak256(PROXY_BYTECODE);
 
-    function deploy(
-        bytes32 salt,
-        bytes memory creationCode,
-        uint256 value
-    ) internal returns (address deployed) {
+    function deploy(bytes32 salt, bytes memory creationCode, uint256 value) internal returns (address deployed) {
         bytes memory proxyChildBytecode = PROXY_BYTECODE;
 
         address proxy;
@@ -51,33 +47,21 @@ library CREATE3 {
         require(proxy != address(0), "DEPLOYMENT_FAILED");
 
         deployed = getDeployed(salt);
-        (bool success, ) = proxy.call{value: value}(creationCode);
+        (bool success,) = proxy.call{value: value}(creationCode);
         require(success && deployed.code.length != 0, "INITIALIZATION_FAILED");
     }
 
     function getDeployed(bytes32 salt) internal view returns (address) {
-        address proxy = keccak256(
-            abi.encodePacked(
-                // Prefix:
-                bytes1(0xFF),
-                // Creator:
-                address(this),
-                // Salt:
-                salt,
-                // Bytecode hash:
-                PROXY_BYTECODE_HASH
-            )
-        ).fromLast20Bytes();
+        address proxy = keccak256(abi.encodePacked(bytes1(0xFF), address(this), salt, PROXY_BYTECODE_HASH))
+            // Prefix:
+            // Creator:
+            // Salt:
+            // Bytecode hash:
+            .fromLast20Bytes();
 
-        return
-            keccak256(
-                abi.encodePacked(
-                    // 0xd6 = 0xc0 (short RLP prefix) + 0x16 (length of: 0x94 ++ proxy ++ 0x01)
-                    // 0x94 = 0x80 + 0x14 (0x14 = the length of an address, 20 bytes, in hex)
-                    hex"d6_94",
-                    proxy,
-                    hex"01" // Nonce of the proxy contract (1)
-                )
-            ).fromLast20Bytes();
+        return keccak256(abi.encodePacked(hex"d694", proxy, hex"01")) // Nonce of the proxy contract (1)
+            // 0xd6 = 0xc0 (short RLP prefix) + 0x16 (length of: 0x94 ++ proxy ++ 0x01)
+            // 0x94 = 0x80 + 0x14 (0x14 = the length of an address, 20 bytes, in hex)
+            .fromLast20Bytes();
     }
 }

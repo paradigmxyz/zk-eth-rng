@@ -35,7 +35,7 @@ contract BlockhashOpcodeOracle is IBlockhashOracle {
 
     /// @notice Validates the block hash of the block before this tx is called.
     function poke() public {
-        uint256 prevBlockNum = block.number-1;
+        uint256 prevBlockNum = block.number - 1;
         setValidBlockhash(blockhash(prevBlockNum), prevBlockNum);
     }
 

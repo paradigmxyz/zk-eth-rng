@@ -9,7 +9,7 @@ interface IBlockhashOracle {
     /// @notice Emits the validated block number and block hash.
     event BlockhashValidated(uint256 indexed blockNum, bytes32 indexed blockHash);
 
-    /// @notice Returns the nonzero, accurate block number 
+    /// @notice Returns the nonzero, accurate block number
     /// if the block hash is validated!.
     function blockHashToNumber(bytes32 hash) external view returns (uint256);
 }

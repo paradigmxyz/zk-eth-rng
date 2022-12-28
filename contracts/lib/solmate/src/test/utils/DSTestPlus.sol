@@ -92,11 +92,7 @@ contract DSTestPlus is DSTest {
         b ? assertTrue(a) : assertFalse(a);
     }
 
-    function assertApproxEq(
-        uint256 a,
-        uint256 b,
-        uint256 maxDelta
-    ) internal virtual {
+    function assertApproxEq(uint256 a, uint256 b, uint256 maxDelta) internal virtual {
         uint256 delta = a > b ? a - b : b - a;
 
         if (delta > maxDelta) {
@@ -145,18 +141,16 @@ contract DSTestPlus is DSTest {
         }
     }
 
-    function bound(
-        uint256 x,
-        uint256 min,
-        uint256 max
-    ) internal virtual returns (uint256 result) {
+    function bound(uint256 x, uint256 min, uint256 max) internal virtual returns (uint256 result) {
         require(max >= min, "MAX_LESS_THAN_MIN");
 
         uint256 size = max - min;
 
-        if (size == 0) result = min;
-        else if (size == type(uint256).max) result = x;
-        else {
+        if (size == 0) {
+            result = min;
+        } else if (size == type(uint256).max) {
+            result = x;
+        } else {
             ++size; // Make max inclusive.
             uint256 mod = x % size;
             result = min + mod;
@@ -165,11 +159,7 @@ contract DSTestPlus is DSTest {
         emit log_named_uint("Bound Result", result);
     }
 
-    function min3(
-        uint256 a,
-        uint256 b,
-        uint256 c
-    ) internal pure returns (uint256) {
+    function min3(uint256 a, uint256 b, uint256 c) internal pure returns (uint256) {
         return a > b ? (b > c ? c : b) : (a > c ? c : a);
     }
 

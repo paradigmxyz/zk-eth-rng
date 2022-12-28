@@ -208,11 +208,7 @@ contract FixedPointMathLibTest is DSTestPlus {
         FixedPointMathLib.divWadUp(x, 0);
     }
 
-    function testMulDivDown(
-        uint256 x,
-        uint256 y,
-        uint256 denominator
-    ) public {
+    function testMulDivDown(uint256 x, uint256 y, uint256 denominator) public {
         // Ignore cases where x * y overflows or denominator is 0.
         unchecked {
             if (denominator == 0 || (x != 0 && (x * y) / x != y)) return;
@@ -221,11 +217,7 @@ contract FixedPointMathLibTest is DSTestPlus {
         assertEq(FixedPointMathLib.mulDivDown(x, y, denominator), (x * y) / denominator);
     }
 
-    function testFailMulDivDownOverflow(
-        uint256 x,
-        uint256 y,
-        uint256 denominator
-    ) public pure {
+    function testFailMulDivDownOverflow(uint256 x, uint256 y, uint256 denominator) public pure {
         // Ignore cases where x * y does not overflow or denominator is 0.
         unchecked {
             if (denominator == 0 || (x * y) / x == y) revert();
@@ -238,11 +230,7 @@ contract FixedPointMathLibTest is DSTestPlus {
         FixedPointMathLib.mulDivDown(x, y, 0);
     }
 
-    function testMulDivUp(
-        uint256 x,
-        uint256 y,
-        uint256 denominator
-    ) public {
+    function testMulDivUp(uint256 x, uint256 y, uint256 denominator) public {
         // Ignore cases where x * y overflows or denominator is 0.
         unchecked {
             if (denominator == 0 || (x != 0 && (x * y) / x != y)) return;
@@ -251,11 +239,7 @@ contract FixedPointMathLibTest is DSTestPlus {
         assertEq(FixedPointMathLib.mulDivUp(x, y, denominator), x * y == 0 ? 0 : (x * y - 1) / denominator + 1);
     }
 
-    function testFailMulDivUpOverflow(
-        uint256 x,
-        uint256 y,
-        uint256 denominator
-    ) public pure {
+    function testFailMulDivUpOverflow(uint256 x, uint256 y, uint256 denominator) public pure {
         // Ignore cases where x * y does not overflow or denominator is 0.
         unchecked {
             if (denominator == 0 || (x * y) / x == y) revert();
@@ -314,8 +298,9 @@ contract FixedPointMathLibTest is DSTestPlus {
 
     function abdkSqrt(uint256 x) private pure returns (uint256) {
         unchecked {
-            if (x == 0) return 0;
-            else {
+            if (x == 0) {
+                return 0;
+            } else {
                 uint256 xx = x;
                 uint256 r = 1;
                 if (xx >= 0x100000000000000000000000000000000) {

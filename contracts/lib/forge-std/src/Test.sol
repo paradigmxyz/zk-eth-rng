@@ -8,11 +8,4 @@ import {console, console2, StdAssertions, StdChains, StdCheats, stdError, stdJso
 
 abstract contract TestBase is CommonBase {}
 
-abstract contract Test is
-    DSTest,
-    StdAssertions,
-    StdChains,
-    StdCheats,
-    StdUtils,
-    TestBase
-{}
+abstract contract Test is DSTest, StdAssertions, StdChains, StdCheats, StdUtils, TestBase {}
