@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Instructions:
+# 1. Run `yarn install` in both circuits & scripts directories.
+# 2. Modify RPC_URL to the desired network.
+# 3. Run from scripts directory
+#    Example usage: BLOCK_NUM=8150150 ./build_single_block_zkp.sh
+#    Outputs to /build and /proof_data_${BLOCK_NUM} subdirectories in the circuits directory.
+
 # High level steps:
 # 1. Generates RLP encoded blockheader input for the circuit.
 # 2. Compiles the circuit.
@@ -7,12 +14,6 @@
 # 4. Generates a trusted setup.
 # 5. Generates a proof.
 # 6. Generates calldata for verifier contract.
-
-# Instructions:
-# 1. Run from scripts directory
-# 2. Modify RPC_URL to the desired network.
-# Example usage: BLOCK_NUM=8150150 ./build_single_block.sh
-# Outputs to /build and /proof_data_${BLOCK_NUM} subdirectories in the circuits directory.
 
 # Notes:
 # 1. If singleBlockHeader.circom is modified, delete the build folder and rerun this script.
@@ -31,9 +32,11 @@ PHASE1=../circuits/powers_of_tau/powersOfTau28_hez_final_22.ptau
 BUILD_DIR=../circuits/single_block_header_zkp/build
 COMPILED_DIR=$BUILD_DIR/compiled_circuit
 TRUSTED_SETUP_DIR=$BUILD_DIR/trusted_setup
-BLOCK_DIR=../circuits/single_block_header_zkp/proof_data_${BLOCK_NUM}
+
+BLOCK_PROOF_DIR=../circuits/single_block_header_zkp/proof_data_${BLOCK_NUM}
 
 CIRCUIT_NAME=singleBlockHeader
+CIRCUIT_PATH=../circuits/single_block_header_zkp/$CIRCUIT_NAME.circom
 
 echo "BLOCK_NUM: $BLOCK_NUM"
 if [[ ! -z "${DEPLOY_ENV}" ]]; then
@@ -56,15 +59,15 @@ if [ ! -d "$TRUSTED_SETUP_DIR" ]; then
     mkdir "$TRUSTED_SETUP_DIR"
 fi
 
-if [ ! -d "$BLOCK_DIR" ]; then
+if [ ! -d "$BLOCK_PROOF_DIR" ]; then
     echo "No directory found for proof data. Creating a block's proof data directory..."
-    mkdir "$BLOCK_DIR"
+    mkdir "$BLOCK_PROOF_DIR"
 fi
 
 echo $PWD
 
 echo "****GENERATING INPUT FOR PROOF****"
-echo $BLOCK_DIR/input.json
+echo $BLOCK_PROOF_DIR/input.json
 start=`date +%s`
 yarn ts-node generateProofInput.ts --blockNum ${BLOCK_NUM} --rpc ${RPC_URL}
 end=`date +%s`
@@ -73,14 +76,14 @@ echo "DONE ($((end-start))s)"
 if [ ! -f "$COMPILED_DIR"/"$CIRCUIT_NAME".r1cs ]; then
     echo "**** COMPILING CIRCUIT $CIRCUIT_NAME.circom ****"
     start=`date +%s`
-    circom "./single_block_header_zkp/$CIRCUIT_NAME".circom --O1 --r1cs --wasm --c --sym --output "$COMPILED_DIR"
+    circom "$CIRCUIT_PATH" --O1 --r1cs --wasm --c --sym --output "$COMPILED_DIR"
     end=`date +%s`
     echo "DONE ($((end-start))s)"
 fi
 
 echo "****GENERATING WITNESS FOR SAMPLE INPUT****"
-echo $BLOCK_DIR/input.json
-if [ -f $BLOCK_DIR/input.json ]; then
+echo $BLOCK_PROOF_DIR/input.json
+if [ -f $BLOCK_PROOF_DIR/input.json ]; then
     echo "Found input file!"
 else
     echo "No input file found. Exiting..."
@@ -89,7 +92,7 @@ fi
 
 start=`date +%s`
 node "$COMPILED_DIR"/"$CIRCUIT_NAME"_js/generate_witness.js \
-    "$COMPILED_DIR"/"$CIRCUIT_NAME"_js/"$CIRCUIT_NAME".wasm $BLOCK_DIR/input.json \
+    "$COMPILED_DIR"/"$CIRCUIT_NAME"_js/"$CIRCUIT_NAME".wasm $BLOCK_PROOF_DIR/input.json \
     "$BUILD_DIR"/witness.wtns
 end=`date +%s`
 echo "DONE ($((end-start))s)"
@@ -131,7 +134,7 @@ fi
 
 echo "****GENERATING PROOF FOR SAMPLE INPUT****"
 start=`date +%s`
-yarn snarkjs groth16 prove "$TRUSTED_SETUP_DIR"/"$CIRCUIT_NAME".zkey "$BUILD_DIR"/witness.wtns "$BLOCK_DIR"/proof.json "$BLOCK_DIR"/public.json
+yarn snarkjs groth16 prove "$TRUSTED_SETUP_DIR"/"$CIRCUIT_NAME".zkey "$BUILD_DIR"/witness.wtns "$BLOCK_PROOF_DIR"/proof.json "$BLOCK_PROOF_DIR"/public.json
 end=`date +%s`
 echo "DONE ($((end-start))s)"
  
@@ -146,6 +149,6 @@ echo "DONE ($((end-start))s)"
 # Outputs calldata for the verifier contract.
 echo "****GENERATING CALLDATA FOR VERIFIER CONTRACT****"
 start=`date +%s`
-snarkjs zkey export soliditycalldata $BLOCK_DIR/public.json "$BLOCK_DIR"/proof.json > "$BLOCK_DIR"/calldata.txt
+snarkjs zkey export soliditycalldata $BLOCK_PROOF_DIR/public.json "$BLOCK_PROOF_DIR"/proof.json > "$BLOCK_PROOF_DIR"/calldata.txt
 end=`date +%s`
 echo "DONE ($((end-start))s)"
