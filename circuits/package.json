@@ -3,9 +3,7 @@
   "license": "GPL-3.0",
   "version": "0.0.1",
   "description": "Attestations to Ethereum block header values",
-  "main": "index.js",
-  "repository": "git@github.com:amangotchu/randaozkp.git",
-  "author": "Aman Gottumukkala <amangotchu@users.noreply.github.com>",
+  "author": "Aman Gottumukkala <AmanGotchuParadigm@users.noreply.github.com>",
   "scripts": {
     "compile": "circom main.circom --r1cs --c --verbose",
     "gen_witness": "node ./main_js/generate_witness.js ./main_js/main.wasm ./witness_generation/input.json ./witness_generation/witness.wtns",
