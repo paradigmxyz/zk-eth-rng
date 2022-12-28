@@ -61,5 +61,5 @@ if (!rpcUrl) {
     throw new Error("CLI arg 'rpc' is required!")
 }
 
-// usage: $ yarn ts-node ./single_block_header_zkp/generateBlockInfo.ts --blockNum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
+// usage: $ yarn ts-node generateBlockInfo.ts --blockNum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
 generateBlockInfo(rpcUrl, blockNum);

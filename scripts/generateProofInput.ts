@@ -49,18 +49,19 @@ async function generateProofInput(rpcUrl: string, blockNum: number) {
     blockRlpHexs: rlpHexEncodedHeader,
   };
 
-  const dir = `./single_block_header_zkp/proof_data_${blockNum}`;
+  // Write object to a block specific folder in circuits directory.
+  const dir = `../circuits/single_block_header_zkp/proof_data_${blockNum}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
-  const file = `./single_block_header_zkp/proof_data_${blockNum}/input.json`;
+  const file = `../circuits/single_block_header_zkp/proof_data_${blockNum}/input.json`;
 
   console.log("Writing proof input file", {
     file,
     rlpHeaderHex,
   });
 
-  // Write object
+  // Write file.
   fs.writeFileSync(
     file,
     JSON.stringify(rlpHeaderHex, null, 2)
@@ -83,5 +84,5 @@ if (!rpcUrl) {
   throw new Error("CLI arg 'rpc' is required!")
 }
 
-// usage: $ yarn ts-node single_block_header_zkp/generateProofInput.ts --blockNum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
+// usage: $ yarn ts-node generateProofInput.ts --blockNum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
 generateProofInput(rpcUrl, blockNum);

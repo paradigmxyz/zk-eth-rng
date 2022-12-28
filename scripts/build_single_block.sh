@@ -9,9 +9,10 @@
 # 6. Generates calldata for verifier contract.
 
 # Instructions:
-# Run from circuits directory
-# Example usage: BLOCK_NUM=8150150 ./single_block_header_zkp/build_single_block.sh
-# Outputs to /build and /proof_data_${BLOCK_NUM} directories
+# 1. Run from scripts directory
+# 2. Modify RPC_URL to the desired network.
+# Example usage: BLOCK_NUM=8150150 ./build_single_block.sh
+# Outputs to /build and /proof_data_${BLOCK_NUM} subdirectories in the circuits directory.
 
 # Notes:
 # 1. If singleBlockHeader.circom is modified, delete the build folder and rerun this script.
@@ -24,13 +25,13 @@ RPC_URL="https://ethereum-goerli-rpc.allthatnode.com"
 
 # Download the powers of tau file from here: https://github.com/iden3/snarkjs#7-prepare-phase-2
 # Move to directory specified below
-PHASE1=./powers_of_tau/powersOfTau28_hez_final_22.ptau
+PHASE1=../circuits/powers_of_tau/powersOfTau28_hez_final_22.ptau
 
 # Relevant directories.
-BUILD_DIR=./single_block_header_zkp/build
+BUILD_DIR=../circuits/single_block_header_zkp/build
 COMPILED_DIR=$BUILD_DIR/compiled_circuit
 TRUSTED_SETUP_DIR=$BUILD_DIR/trusted_setup
-BLOCK_DIR=./single_block_header_zkp/proof_data_${BLOCK_NUM}
+BLOCK_DIR=../circuits/single_block_header_zkp/proof_data_${BLOCK_NUM}
 
 CIRCUIT_NAME=singleBlockHeader
 
@@ -65,7 +66,7 @@ echo $PWD
 echo "****GENERATING INPUT FOR PROOF****"
 echo $BLOCK_DIR/input.json
 start=`date +%s`
-yarn ts-node ./single_block_header_zkp/generateProofInput.ts --blockNum ${BLOCK_NUM} --rpc ${RPC_URL}
+yarn ts-node generateProofInput.ts --blockNum ${BLOCK_NUM} --rpc ${RPC_URL}
 end=`date +%s`
 echo "DONE ($((end-start))s)"
 
