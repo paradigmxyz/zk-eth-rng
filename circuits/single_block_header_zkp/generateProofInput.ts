@@ -1,136 +1,87 @@
 import { ethers } from "ethers";
-import axios from "axios";
 import fs from 'fs';
+import _ from "lodash";
+import minimist from "minimist";
 
-const generateProofInput = async (blocknum: number, rpcURL: string) => {
-  // Get block header RLP encoded.
-  const rlpHexEncodedHeader = await constructHexRLPHeader(blocknum, rpcURL);
+import { BLOCK_HEADER_FIELDS, cleanHeaderFields, getBlockHeaderFields } from "./utils";
 
-  // Write proof input file.
-  const output = {
-    blockRlpHexs: rlpHexEncodedHeader,
-  };
+async function generateProofInput(rpcUrl: string, blockNum: number) {
+  // Get block data fields from RPC.
+  console.log("Fetching block data from RPC...", {
+    rpcUrl,
+    blockNum,
+  })
+  const block = await getBlockHeaderFields(rpcUrl, blockNum);
+  const expectedBlockhash = block.hash;
 
-  // Run script from ciruits directory.
-  const dir = `./single_block_header_zkp/proof_data_${blocknum}`;
-  if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-  }
-  const file = `./single_block_header_zkp/proof_data_${blocknum}/input.json`;
+  // Clean required block header fields for RLP format spec.
+  console.log("Cleaning block header fields");
+  const cleanedHeaderFields = cleanHeaderFields(block);
 
-  const jsonfile = require("jsonfile");
-  jsonfile.writeFileSync(file, output);
-  return;
-};
+  // RLP encode header fields.
+  console.log("RLP encoding header fields");
+  let rlp = ethers.utils.RLP.encode(_.at(cleanedHeaderFields, BLOCK_HEADER_FIELDS));
 
-// Encodes a block header response from eth_getBlockByNumber into RLP.
-const constructHexRLPHeader = async (blockNumber: number, rpcURL: string) => {
-  // Construct RLP encoded block header.
-  const blockHeaderData = (await axios.post(rpcURL, {
-    jsonrpc: "2.0",
-    id: 0,
-    method: "eth_getBlockByNumber",
-    params: [
-      blockNumber ? "0x" + blockNumber.toString(16) : "latest", false],
-  })).data.result;
+  // Derive blockhash from RLP encoded header.
+  const derivedBlockhash = ethers.utils.keccak256(rlp);
+  console.log("Derived blockhash from RLP encoded header", derivedBlockhash);
 
-  const {
-    parentHash,
-    sha3Uncles,
-    miner,
-    stateRoot,
-    transactionsRoot,
-    receiptsRoot,
-    logsBloom,
-    difficulty,
-    number,
-    gasLimit,
-    gasUsed,
-    timestamp,
-    extraData,
-    mixHash,
-    nonce,
-    baseFeePerGas, // For Post 1559 blocks.
-    hash, // For sanity comparison check.
-  } = blockHeaderData;
-
-  // Construct bytes like input to RLP encode function.
-  const blockHeaderInputs: { [key: string]: string } = {
-    parentHash,
-    sha3Uncles,
-    miner,
-    stateRoot,
-    transactionsRoot,
-    receiptsRoot,
-    logsBloom,
-    difficulty,
-    number,
-    gasLimit,
-    gasUsed,
-    timestamp,
-    extraData,
-    mixHash,
-    nonce,
-    baseFeePerGas
-  };
-
-  // Format inputs according to RLP encoding spec.
-  Object.keys(blockHeaderInputs).map((key: string) => {
-    let val = blockHeaderInputs[key];
-
-    // All 0 values for these fields must be 0x.
-    if (["gasLimit", "gasUsed", "timestamp", "difficulty", "number"].includes(key)) {
-      if (parseInt(val, 16) === 0) {
-        val = "0x";
-      }
-    }
-
-    // Pad hex for proper Bytes parsing.
-    if (val.length % 2 == 1) {
-      val = val.substring(0, 2) + "0" + val.substring(2);
-    }
-
-    blockHeaderInputs[key] = val;
-  });
-
-  // RLP encode.
-  let rlpEncodedHeader = ethers.utils.RLP.encode(
-    Object.values(blockHeaderInputs)
-  );
-  const derivedBlockHash = ethers.utils.keccak256(rlpEncodedHeader);
-
-  console.log("=========================");
-  console.log("Block Number", number);
-  console.log("Mix hash", mixHash);
-  console.log("RLP Derived Block Hash", derivedBlockHash);
-  console.log("Actual Block Hash", hash);
-
-  // Sanity check.
-  if (derivedBlockHash !== hash) {
-    throw new Error(`Derived ${derivedBlockHash} doesn't match expected ${hash}`);
+  // Sanity check derived blockhash matches blockhash from RPC.
+  if (derivedBlockhash !== expectedBlockhash) {
+    throw new Error("Blockhash mismatch, might be computing blockhash for pre-1559 blocks!");
   }
 
-  rlpEncodedHeader = rlpEncodedHeader.replace("0x", ""); // Remove 0x prefix.
-  const rlpHexEncodedHeader = [...rlpEncodedHeader].map((char) => parseInt(char, 16));
+  // Remove 0x prefix.
+  rlp = rlp.replace("0x", "");
+
+  // Convert to hex.
+  const rlpHexEncodedHeader = [...rlp].map((char) => parseInt(char, 16));
+  console.log("Hex encoded RLP header", rlpHexEncodedHeader)
 
   // Pad to length 1112 required by circom circuit.
   const padLen = 1112 - rlpHexEncodedHeader.length;
-  for (let i = 0; i<padLen; i++) {
+  for (let i = 0; i < padLen; i++) {
     rlpHexEncodedHeader.push(0);
   }
 
-  return rlpHexEncodedHeader;
-};
+  // Write proof input object.
+  const rlpHeaderHex = {
+    blockRlpHexs: rlpHexEncodedHeader,
+  };
 
-const main = async () => {
-  const { height, rpcURL } = require('minimist')(process.argv.slice(2));
-  if (!height) {
-    throw new Error("CLI arg 'height' is required!")
+  const dir = `./single_block_header_zkp/proof_data_${blockNum}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
   }
-  if (!rpcURL) {
-    throw new Error("CLI arg 'rpcURL' is required!")
-  }
-  generateProofInput(height, rpcURL);
+  const file = `./single_block_header_zkp/proof_data_${blockNum}/input.json`;
+
+  console.log("Writing proof input file", {
+    file,
+    rlpHeaderHex,
+  });
+
+  // Write object
+  fs.writeFileSync(
+    file,
+    JSON.stringify(rlpHeaderHex, null, 2)
+  );
+
+  console.log("Finished writing proof input file", file);
 }
 
-main();
+const argv = minimist(process.argv.slice(2));
+const blockNum = parseInt(argv.blockNum || process.env.BLOCK_NUM, 10);
+const rpcUrl = argv.rpc || process.env.RPC_URL;
+
+console.log("Parsed inputs", { blockNum, rpcUrl });
+
+if (!blockNum) {
+  throw new Error("CLI arg 'blockNum' is required!")
+}
+
+if (!rpcUrl) {
+  throw new Error("CLI arg 'rpc' is required!")
+}
+
+// usage: $yarn run getBlockInfo --blocknum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
+generateProofInput(rpcUrl, blockNum);
