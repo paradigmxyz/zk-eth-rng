@@ -27,7 +27,7 @@ The project is structured as a mixed Solidity and Circom workspace.
 - ZK-circuit proving link between two blocks via RLP deserialization, with scripts to aid proof generation and corresponding [block hash oracle contract implementation](contracts/src/ZKBlockhashOracle.sol)
 - [Helper script](contracts/scripts/generateBlockHashProofTestData.ts) to generate raw data used in the ZK circuit; example of consuming illustrated in [ZKBlockhashOracleTest](contracts/tests/ZKBlockhashOracleTest.ts).
 
-To generate test data for the zk-based oracle, using the Typescript helper scripts:
+To generate test data for the zk-based oracle, using the Typescript helper script:
 
 ```sh
 cd contracts
@@ -45,10 +45,18 @@ forge test --match-contract "BlockhashOpcodeOracleTest|ZKBlockhashOracleTest"
 
 ### Randomness Interface and Provider
 
-- Contract interface for randomness provider
-- Example randomness provider implementation, providing randomness from unrolled block headers
-- Helper scripts to generate properly formatted transaction payload to fulfill randomness requests
-- Stub VDF implementation
+- [Contract interface](contracts/src/IRandomnessProvider.sol) for randomness provider
+- Example [randomness provider implementation](contracts/src/RANDAOProvider.sol), providing randomness from unrolled block headers
+- [Helper scripts](contracts/scripts/generate) to generate properly formatted transaction payload to fulfill randomness requests
+- [VDF reference implementation](contracts/src/VDFProvider.sol)
+
+To generate test data for the RANDAO-based randomness provider using the Typescript helper script:
+```sh
+cd contracts
+yarn install
+// TODO(sina) update this section as the code finalizes
+yarn ts-node ./scripts/generateBlockHashProofTestData.ts
+```
 
 To run Solidity tests:
 
@@ -57,21 +65,9 @@ cd contracts
 forge test --match-contract "RANDAOOracleTest"
 ```
 
-## Usage (// TODO(sina) tighten this section as the code finalizes)
+### Circuits
 
-To run the contract tests:
-
-```sh
-forge test --filter=blockhashoracle
-```
-
-To generate a sample ZKP of the link between two blockhashes:
-
-```sh
-TODO some nodejs script, or some bash scripts?
-```
-
-// TODO(sina) add examples of how to run each of the js helpers and what to do with their outputs
+// TODO section laying out what's going on in this folder potentially with some links, and then a short example of how to run tests/scripts
 
 ## Disclaimer
 
