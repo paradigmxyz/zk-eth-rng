@@ -29,7 +29,7 @@ contract BlockhashOpcodeOracleTest is Test {
         emit BlockhashValidated(99, pokedBlockhash);
 
         BlockhashOpcodeOracle oracle = new BlockhashOpcodeOracle();
-        assertEq(oracle.blockHashToNumber(pokedBlockhash), 99);
+        assertEq(oracle.blockhashToBlockNum(pokedBlockhash), 99);
     }
 
     /// @notice Tests that poking attests to the previous block's block hash.
@@ -70,6 +70,6 @@ contract BlockhashOpcodeOracleTest is Test {
 
     /// @notice Wrapper function that determines if a block hash is valid.
     function isValidBlockhash(bytes32 blockHash) internal view returns (bool) {
-        return blockhashOracle.blockHashToNumber(blockHash) != 0;
+        return blockhashOracle.blockhashToBlockNum(blockHash) != 0;
     }
 }

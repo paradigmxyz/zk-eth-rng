@@ -26,13 +26,6 @@ contract BlockhashOpcodeOracle is IBlockhashOracle {
         poke();
     }
 
-    /// @notice Returns the block number of a validated block hash.
-    /// This doubles as a block hash verifier and a block number oracle.
-    /// @param hash Blockhash being verified.
-    function blockHashToNumber(bytes32 hash) external view returns (uint256) {
-        return blockhashToBlockNum[hash];
-    }
-
     /// @notice Validates the block hash of the block before this tx is called.
     function poke() public {
         uint256 prevBlockNum = block.number - 1;

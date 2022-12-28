@@ -258,7 +258,7 @@ contract RANDAOOracleTest is Test {
 
     /// @notice Mocks the block hash oracle's response for a validity check.
     function mockOracle(bytes32 blockHash, uint256 response) internal {
-        stdstore.target(address(blockhashOracle)).sig("blockHashToNumber(bytes32)").with_key(blockHash).checked_write(
+        stdstore.target(address(blockhashOracle)).sig("blockhashToBlockNum(bytes32)").with_key(blockHash).checked_write(
             response
         );
     }
