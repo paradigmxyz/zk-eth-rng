@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
+// Original source @ https://github.com/hamdiallam/Solidity-RLP.
+
 /**
  * @author Hamdi Allam hamdi.allam97@gmail.com
  * Please reach out with any questions or concerns
