@@ -40,6 +40,7 @@ contract RANDAOOracleTest is Test {
         // Only testing blocknums that we have blockdata json files for.
         blockNums.push(15537394);
         blockNums.push(15537395);
+        blockNums.push(15539395);
     }
 
     /*//////////////////////////////////////////////////////////////

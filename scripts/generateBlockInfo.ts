@@ -42,7 +42,7 @@ async function generateBlockInfo(rpcUrl: string, blockNum: number) {
 
     // Write object
     fs.writeFileSync(
-        `./${blockNum}.json`,
+        `../contracts/testdata/blockheaderinfo/${blockNum}.json`,
         JSON.stringify(blockInfo, null, 2)
     );
 }
@@ -61,5 +61,5 @@ if (!rpcUrl) {
     throw new Error("CLI arg 'rpc' is required!")
 }
 
-// usage: $ yarn ts-node generateBlockInfo.ts --blockNum 8150150 --rpc https://ethereum-goerli-rpc.allthatnode.com
+// usage: $ yarn ts-node generateBlockInfo.ts --blockNum 15539395 --rpc https://ethereum-mainnet-rpc.allthatnode.com
 generateBlockInfo(rpcUrl, blockNum);
