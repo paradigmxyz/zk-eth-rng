@@ -52,7 +52,7 @@ export async function getBlockHeaderFields(rpcUrl: string, blockNumber: number):
     return blockHeader;
 }
 
-// Cleans header fields to conform to the expected RLP format.
+// Cleans header fields to the expected RLP format.
 export function cleanHeaderFields(header: Block): Block {
     const cleanedHeader = _.mapValues(header, (val, key) => {
         // Zero values should just be 0x, unless it's for the nonce.

@@ -4,8 +4,10 @@
 # 1. Run `yarn install` in both circuits & scripts directories.
 # 2. Modify RPC_URL to the desired network.
 # 3. Run from scripts directory
-#    Example usage: BLOCK_NUM=8150150 ./build_single_block_zkp.sh
-#    Outputs to /build and /proof_data_${BLOCK_NUM} subdirectories in the circuits directory.
+#    Example usage: BLOCK_NUM=8150150 RPC_URL=https://ethereum-goerli-rpc.allthatnode.com ./run_single_block_zkp.sh
+#    - Outputs to /build and /proof_data_${BLOCK_NUM} subdirectories in the circuits directory.
+#    - BLOCK_NUM refers to a block already verified on-chain. 
+#      This circuit produces a proof attesting to the parent hash of a previously verified block!
 
 # High level steps:
 # 1. Generates RLP encoded blockheader input for the circuit.
@@ -20,9 +22,6 @@
 # 2. When encountering errors, try deleting ./single_block_header_zkp/build and/or rerunning this script.
 
 set -e
-
-# Change RPC URL to the desired network
-RPC_URL="https://ethereum-goerli-rpc.allthatnode.com"
 
 # Download the powers of tau file from here: https://github.com/iden3/snarkjs#7-prepare-phase-2
 # Move to directory specified below
