@@ -29,7 +29,7 @@ cd scripts && yarn install
 
 ### Directory Structure
 
-The project is structured as a mixed Solidity and Circom workspace.
+The project is structured as a mixed Solidity, Circom, and Typescript workspace.
 
 ```
 ├── circuits  // <-- Circom source code
@@ -40,9 +40,9 @@ The project is structured as a mixed Solidity and Circom workspace.
 ### Block Hash Oracle
 
 - [Blockhash oracle interface contract](contracts/src/IBlockhashOracle.sol)
-- [Blockhash opcode based oracle contract implementation](contracts/src/BlockhashOpcodeOracle.sol), checkpointing block hashes via opcode lookup.
+- [Blockhash opcode based oracle contract implementation](contracts/src/BlockhashOpcodeOracle.sol), checkpointing block hashes via opcode lookup
 - [ZK circuit](circuits/single_block_header_zkp/singleBlockHeader.circom) proving the parent blockhash of an already verified block via RLP deserialization, with [script](scripts/run_single_block_zkp.sh) to aid proof generation and corresponding [block hash oracle contract implementation](contracts/src/ZKBlockhashOracle.sol)
-- [Helper script](scripts/run_single_block_zkp.sh) to generate raw data used in the ZK circuit; example of consuming illustrated in [ZKBlockhashOracleTest](contracts/test/ZKBlockhashOracle.t.sol).
+- [Helper script](scripts/run_single_block_zkp.sh) to generate raw data used in the ZK circuit; example of consuming illustrated in [ZKBlockhashOracleTest](contracts/test/ZKBlockhashOracle.t.sol)
 
 To run Solidity tests:
 
