@@ -16,8 +16,9 @@ To get started with this repo, you will need to have the following set up on you
 The project is structured as a mixed Solidity and Circom workspace.
 
 ```
-├── circuits // <-- Circom source code
+├── circuits  // <-- Circom source code
 ├── contracts // <- Solidity source code
+├── scripts   // <- Typescript utility scripts
 ```
 
 ### Block Hash Oracle
@@ -27,14 +28,7 @@ The project is structured as a mixed Solidity and Circom workspace.
 - ZK-circuit proving link between two blocks via RLP deserialization, with scripts to aid proof generation and corresponding [block hash oracle contract implementation](contracts/src/ZKBlockhashOracle.sol)
 - [Helper script](contracts/scripts/generateBlockHashProofTestData.ts) to generate raw data used in the ZK circuit; example of consuming illustrated in [ZKBlockhashOracleTest](contracts/tests/ZKBlockhashOracleTest.ts).
 
-To generate test data for the zk-based oracle, using the Typescript helper script:
-
-```sh
-cd contracts
-yarn install
-// TODO(sina) update this section as the code finalizes
-yarn ts-node ./scripts/generateBlockHashProofTestData.ts
-```
+// TODO add details of using the TS helper script to generate ZK circuit data
 
 To run Solidity tests:
 
@@ -51,12 +45,14 @@ forge test --match-contract "BlockhashOpcodeOracleTest|ZKBlockhashOracleTest"
 - [VDF reference implementation](contracts/src/VDFProvider.sol)
 
 To generate test data for the RANDAO-based randomness provider using the Typescript helper script:
+
 ```sh
-cd contracts
+cd scripts
 yarn install
-// TODO(sina) update this section as the code finalizes
-yarn ts-node ./scripts/generateBlockHashProofTestData.ts
+yarn ts-node generateBlockInfo.ts --blockNum 15539395 --rpc https://ethereum-mainnet-rpc.allthatnode.com
 ```
+
+This will write a new JSON testdata file to `contracts/testdata/blockheaderinfo`. To include this block in the test, add the block number to the array similar to [this example](contracts/test/RandomnessProvider.t.sol#L42d).
 
 To run Solidity tests:
 
