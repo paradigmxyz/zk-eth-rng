@@ -55,14 +55,14 @@ To generate proof calldata for the ZK blockhash oracle contract:
 ```sh
 # Circuits proves the parent hash of the specified BLOCK_NUM.
 cd scripts
-BLOCK_NUM={} RPC_URL={} ./run_single_block_zkp.sh
+BLOCK_NUM=8150150 RPC_URL=https://ethereum-goerli-rpc.allthatnode.com ./run_single_block_zkp.sh
 ```
 
 ### Randomness Interface and Provider
 
 - [Randomness provider interface](contracts/src/IRandomnessProvider.sol)
 - [RANDAO randomness provider implementation](contracts/src/IRandomnessProvider.sol)
-- [Helper scripts](contracts/scripts/generate) to generate properly formatted block data to fulfill randomness requests.
+- [Helper scripts](contracts/scripts/generate) to generate properly formatted block data to fulfill randomness requests
 - [VDF reference implementation](contracts/src/VDFProvider.sol)
 
 To generate test data for the RANDAO-based randomness provider use the Typescript helper script:
