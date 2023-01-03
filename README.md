@@ -20,7 +20,7 @@ To get started with this repo, you will need to have the following set up on you
 cd ciruits && yarn install
 ```
 
-Download the powers of tau file (powersOfTau28_hez_final_22) [here](https://github.com/iden3/snarkjs#7-prepare-phase-2) and move to `circuits/powers_of_tau` directory.
+This automatically downloads a [powers of tau file](https://github.com/iden3/snarkjs#7-prepare-phase-2) required for generating ZKPs. This download might take a while.
 
 #### Script setup
 ```sh
