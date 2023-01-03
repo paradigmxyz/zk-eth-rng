@@ -84,13 +84,13 @@ forge test --match-contract "RANDAOOracleTest"
 
 ## License
 
-ZK related circuits & contracts are licensed under [GPL 3.0](LICENSE-GPL3.0) due to [circom's license](https://github.com/iden3/circom):
+ZK related circuits & contracts and their tests are licensed under [GPL 3.0](LICENSE-GPL3.0) due to [circom's license](https://github.com/iden3/circom):
 
 - [singleBlockHeader.circom](circuits/single_block_header_zkp/singleBlockHeader.circom)
 - [SingleBlockHeaderVerifier.sol](contracts/src/SingleBlockHeaderVerifier.sol)
 - [ZKBlockhashOracle.sol](contracts/src/ZKBlockhashOracle.sol)
 
-These contracts are licensed under [MIT](LICENSE-MIT):
+These contracts and their tests are licensed under [MIT](LICENSE-MIT):
 
 - [IBlockhashOracle.sol](contracts/src/IBlockhashOracle.sol)
 - [BlockhashOpcodeOracle.sol](contracts/src/BlockhashOpcodeOracle.sol)
