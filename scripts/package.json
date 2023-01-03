@@ -1,6 +1,6 @@
 {
   "name": "eth-rng",
-  "license": "?",
+  "license": "MIT",
   "version": "0.0.1",
   "description": "Utilities for RLP block headers and proof generation.",
   "author": "Aman Gottumukkala <AmanGotchuParadigm@users.noreply.github.com>",
