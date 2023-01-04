@@ -7,6 +7,7 @@ include "../utils/mpt.circom";
 // DISCLAIMER: This circuit was built on top of Yi Sun's zk-attestor circuits.
 // https://github.com/yi-sun/zk-attestor/tree/f4f4b2268f7cf8a0e5ac7f2b5df06a61859f18ca
 // We've made our own modifications to extract additional block header fields.
+// All circuits in the Utils directory are imported.
 
 // This simplified zk-SNARK commits the ParentHash for a given valid block hash.
 // For any blockhash validated on chain (either through blockhash opcode or other blockhash oracle), 
