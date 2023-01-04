@@ -4,6 +4,3 @@
 [submodule "contracts/lib/solmate"]
 	path = contracts/lib/solmate
 	url = https://github.com/transmissions11/solmate
-[submodule "circuits/circom-pairing"]
-	path = circuits/circom-pairing
-	url = https://github.com/yi-sun/circom-pairing.git

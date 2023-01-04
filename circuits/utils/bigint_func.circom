@@ -1,4 +1,4 @@
-pragma circom 2.0.3;
+pragma circom 2.0.2;
 
 function min(a, b) {
     if(a < b)

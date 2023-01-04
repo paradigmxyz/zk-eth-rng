@@ -1,8 +1,0 @@
-build/
-node_modules/
-pot*.ptau
-
-*.swp
-*~
-**/node_modules/
-**/.DS_STORE
