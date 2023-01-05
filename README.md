@@ -1,4 +1,4 @@
-# zk-eth-rng: Utilities for Randomness Generation On Ethereum
+# zk-eth-rng: Utilities for Randomness On Ethereum
 
 This repository contains contracts, circuits, and scripts related to generating and providing randomness for Ethereum's execution layer.
 
