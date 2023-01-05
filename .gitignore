@@ -1,0 +1,18 @@
+/target
+out/
+cache/
+Cargo.lock
+node_modules/
+
+# Circuit files
+circuits/proofs/
+circuits/powers_of_tau/**
+circuits/compiled_circuit/
+circuits/single_block_header_zkp/proof_data_*
+circuits/single_block_header_zkp/build
+circuits/single_block_header_zkp/input.json
+*.r1cs
+*.sym
+*.zkey
+
+.DS_Store

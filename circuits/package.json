@@ -1,0 +1,14 @@
+{
+  "name": "zkp-blockhash",
+  "license": "GPL-3.0",
+  "version": "0.0.1",
+  "description": "Attestations to Ethereum block header values",
+  "author": "Aman Gottumukkala <AmanGotchuParadigm@users.noreply.github.com>",
+  "dependencies": {
+    "circomlib": "^2.0.2",
+    "snarkjs": "^0.4.15"
+  },
+  "scripts": {
+    "postinstall": "./trusted_setup_install.sh"
+  }
+}
