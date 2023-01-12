@@ -98,3 +98,7 @@ These contracts and their tests are licensed under [MIT](LICENSE-MIT):
 - [RANDAOProvider.sol](contracts/src/RANDAOProvider.sol)
 
 All code under [scripts](scripts) is licensed under [MIT](LICENSE-MIT).
+
+## Disclaimer
+
+Contracts and circuits are unoptimized, unaudited, and experimental — use at your own risk! Issues and pull requests are welcome.
