@@ -180,7 +180,8 @@ contract VDFProvider is IRandomnessProvider {
         return generateMoreRandomValues(randomness, numberRandomValues);
     }
 
-    function isValidRANDAO(uint256 blockNumber, uint256 randao) internal returns (bool) {
+    /// @notice Checks if the given randao value is valid for the given block number.
+    function isValidRANDAO(uint256 blockNumber, uint256 randao) internal view returns (bool) {
         // Verify this is a valid ranDAO for this block number
         return randaoProvider.fetchRandomness(blockNumber, 1)[0] == randao;
     }
