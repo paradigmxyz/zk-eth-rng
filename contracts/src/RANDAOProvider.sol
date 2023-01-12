@@ -213,7 +213,7 @@ contract RANDAOProvider is Owned, IRandomnessProvider {
 
         // Validate blockhash using block hash oracle.
         bytes32 blockHash = keccak256(rlp);
-        if (blockhashOracle.blockhashToBlockNum(blockHash) == 0) {
+        if (blockhashOracle.blockhashToBlockNum(blockHash) != blockNum) {
             revert BlockhashUnverified(blockHash);
         }
 

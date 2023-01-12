@@ -63,18 +63,19 @@ contract ZKBlockhashOracle is BlockhashOpcodeOracle, SingleBlockHeaderVerifier {
 
         // If the anchored block hash hasn't been validated, we can try to validate using blockhash opcode.
         if (blockhashToBlockNum[blockHash] == 0) {
-            // If within range anchor blockhash using opcode.
-            if (block.number <= blockNum + 256) {
-                // Verify the blockhash opcode matches the blockhash from the proof.
-                bytes32 blockHashFromOpcode = blockhash(blockNum);
-                if (blockHashFromOpcode != blockHash) {
-                    revert InvalidProof();
-                }
+            bytes32 blockHashFromOpcode = blockhash(blockNum);
 
-                setValidBlockhash(blockHash, blockNum);
-            } else {
+            // If blockhash out of range of opcode, return BlockhashUnvalidated.
+            if (blockHashFromOpcode == 0) {
                 revert BlockhashUnvalidated(blockHash);
             }
+
+            // If within range and doesn't match blockhash from proof, return InvalidProof.
+            if (blockHashFromOpcode != blockHash) {
+                revert InvalidProof();
+            }
+            
+            setValidBlockhash(blockHash, blockNum);
         }
 
         // After fulfilling pre-reqs, we can verify the proof.
