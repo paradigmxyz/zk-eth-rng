@@ -1,0 +1,24 @@
+{
+  "cleanedHeaderFields": {
+    "parentHash": "0x55b11b918355b1ef9c5db810302ebad0bf2544255b530cdce90674d5887bb286",
+    "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+    "miner": "0xeee27662c2b8eba3cd936a23f039f3189633e4c8",
+    "stateRoot": "0x40c07091e16263270f3579385090fea02dd5f061ba6750228fcc082ff762fda7",
+    "transactionsRoot": "0x1ea1746468686159ce730c1cc49a886721244e5d1fa9a06d6d4196b6f013c82c",
+    "receiptsRoot": "0x928073fb98ce316265ea35d95ab7e2e1206cecd85242eb841dbbcc4f568fca4b",
+    "logsBloom": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "difficulty": "0x",
+    "number": "0xed14f2",
+    "gasLimit": "0x01c9c380",
+    "gasUsed": "0x01c9811e",
+    "timestamp": "0x6322c973",
+    "extraData": "0x",
+    "mixHash": "0xa86c2e601b6c44eb4848f7d23d9df3113fbcac42041c49cbed5000cb4f118777",
+    "nonce": "0x0000000000000000",
+    "baseFeePerGas": "0x0b5d68e0a3"
+  },
+  "rlp": "0xf90202a055b11b918355b1ef9c5db810302ebad0bf2544255b530cdce90674d5887bb286a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794eee27662c2b8eba3cd936a23f039f3189633e4c8a040c07091e16263270f3579385090fea02dd5f061ba6750228fcc082ff762fda7a01ea1746468686159ce730c1cc49a886721244e5d1fa9a06d6d4196b6f013c82ca0928073fb98ce316265ea35d95ab7e2e1206cecd85242eb841dbbcc4f568fca4bb90100ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8083ed14f28401c9c3808401c9811e846322c97380a0a86c2e601b6c44eb4848f7d23d9df3113fbcac42041c49cbed5000cb4f118777880000000000000000850b5d68e0a3",
+  "mixHash": "0xa86c2e601b6c44eb4848f7d23d9df3113fbcac42041c49cbed5000cb4f118777",
+  "goldenHash": "0x56a9bb0302da44b8c0b3df540781424684c3af04d0b7a38d72842b762076a664",
+  "calculatedHash": "0x56a9bb0302da44b8c0b3df540781424684c3af04d0b7a38d72842b762076a664"
+}
