@@ -39,7 +39,11 @@ contract BlockhashOpcodeOracleTest is Test {
         bytes32 blockhashToValidate = blockhash(blockNumToValidate);
 
         assertFalse(isValidBlockhash(blockhashToValidate));
-        blockhashOracle.poke();
+
+        (uint256 pokedBlocknum, bytes32 pokedBlockhash) = blockhashOracle.poke();
+        assertEq(pokedBlocknum, blockNumToValidate);
+        assertEq(pokedBlockhash, blockhashToValidate);
+
         assertTrue(isValidBlockhash(blockhashToValidate));
     }
 
@@ -51,7 +55,10 @@ contract BlockhashOpcodeOracleTest is Test {
         bytes32 blockhashToValidate = blockhash(blockNumToValidate);
 
         assertFalse(isValidBlockhash(blockhashToValidate));
-        blockhashOracle.pokeBlocknum(blockNumToValidate);
+        
+        bytes32 pokedBlockhash = blockhashOracle.pokeBlocknum(blockNumToValidate);
+        assertEq(pokedBlockhash, blockhashToValidate);
+
         assertTrue(isValidBlockhash(blockhashToValidate));
     }
 

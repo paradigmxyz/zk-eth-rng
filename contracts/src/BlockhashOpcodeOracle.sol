@@ -27,9 +27,13 @@ contract BlockhashOpcodeOracle is IBlockhashOracle {
     }
 
     /// @notice Validates the block hash of the block before this tx is called.
-    function poke() public {
+    /// @return The block number and blockhash being validated.
+    function poke() public returns (uint256, bytes32) {
         uint256 prevBlockNum = block.number - 1;
-        setValidBlockhash(blockhash(prevBlockNum), prevBlockNum);
+        bytes32 blockhashVal = blockhash(prevBlockNum);
+        setValidBlockhash(blockhashVal, prevBlockNum);
+
+        return (prevBlockNum, blockhashVal);
     }
 
     /// @notice Validates the block hash of a specified block number using
@@ -38,13 +42,14 @@ contract BlockhashOpcodeOracle is IBlockhashOracle {
     /// allow for arbitrary blockhash lookback which makes this blockhash
     /// oracle approach far better.
     /// @param blockNum Block number to validate.
-    function pokeBlocknum(uint256 blockNum) public {
+    function pokeBlocknum(uint256 blockNum) public returns (bytes32) {
         bytes32 blockhashVal = blockhash(blockNum);
         if (blockhashVal == bytes32(0)) {
             revert PokeRangeError();
         }
 
         setValidBlockhash(blockhashVal, blockNum);
+        return blockhashVal;
     }
 
     /// @notice Validates blockhash and blocknum in storage and emits a validated event.
