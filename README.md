@@ -1,5 +1,7 @@
 # zk-eth-rng: Utilities for Randomness On Ethereum
 
+![Github Actions](https://github.com/paradigmxyz/zk-eth-rng/workflows/Tests/badge.svg)
+
 This repository contains contracts, circuits, and scripts related to generating and providing randomness for Ethereum's execution layer.
 
 Meant to accompany the [eth-rng blog post](https://www.paradigm.xyz/2023/01/eth-rng).
