@@ -14,7 +14,9 @@ jobs:
           version: nightly
 
       - name: Install dependencies
+        working-directory: ./contracts
         run: forge install
 
       - name: Run tests
+        working-directory: ./contracts
         run: forge test
