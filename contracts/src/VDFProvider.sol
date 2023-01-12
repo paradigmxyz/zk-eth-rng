@@ -88,7 +88,7 @@ contract VDFProvider is IRandomnessProvider {
         uint256[PUBLIC_INPUT_SIZE] calldata proofPublicInput
     ) external {
         // Verify this is a valid ranDAO for this block number
-        require(randaoProvider.fetchRandomness(blockNumber, 1)[0] == randao, "Invalid randao for this block.");
+        require(isValidRANDAO(blockNumber, randao), "Invalid randao for this block.");
 
         require(
             proofPublicInput[OFFSET_LOG_TRACE_LENGTH] < MAX_LOG_TRACE_LENGTH,
@@ -178,6 +178,11 @@ contract VDFProvider is IRandomnessProvider {
 
         // Uses VDF randomness as the seed to generate more values.
         return generateMoreRandomValues(randomness, numberRandomValues);
+    }
+
+    function isValidRANDAO(uint256 blockNumber, uint256 randao) internal returns (bool) {
+        // Verify this is a valid ranDAO for this block number
+        return randaoProvider.fetchRandomness(blockNumber, 1)[0] == randao;
     }
 
     /// @notice Generates more random values using keccak given an initial seed.
