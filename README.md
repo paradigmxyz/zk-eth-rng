@@ -19,7 +19,7 @@ To get started with this repo, you will need to have the following set up on you
 #### Circuit setup
 
 ```sh
-cd ciruits && yarn install
+cd circuits && yarn install
 ```
 
 This automatically downloads a [powers of tau file](https://github.com/iden3/snarkjs#7-prepare-phase-2) required for generating ZKPs. This download might take a while.
