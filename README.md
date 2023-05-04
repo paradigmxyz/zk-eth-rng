@@ -63,7 +63,7 @@ BLOCK_NUM=8150150 RPC_URL=https://ethereum-goerli-rpc.allthatnode.com ./run_sing
 ### Randomness Interface and Provider
 
 - [Randomness provider interface](contracts/src/IRandomnessProvider.sol)
-- [RANDAO randomness provider implementation](contracts/src/IRandomnessProvider.sol)
+- [RANDAO randomness provider implementation](contracts/src/RANDAOProvider.sol)
 - [Helper scripts](contracts/scripts/generate) to generate properly formatted block data to fulfill randomness requests
 - [VDF reference implementation](contracts/src/VDFProvider.sol)
 
